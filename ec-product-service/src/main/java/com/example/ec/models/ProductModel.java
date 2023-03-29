@@ -32,10 +32,10 @@ public class ProductModel implements Serializable{
 	@Column(columnDefinition = "uuid")
 	private UUID id;
 	
-	@Column(nullable = false, length = 100)
+	@Column(nullable = false, length = 150)
 	private String name;
 	
-	@Column(nullable = false,  length = 200)
+	@Column(nullable = false,  length = 500)
 	private String description;
 	
 	@Column(nullable = false)

@@ -20,10 +20,11 @@ public class ProductRequestDto implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@NotNull
+	@Length(min = 2, max = 150, message = "O nome tem que ter entre 2 e 150 caracteres")
 	private String name;
 
 	@NotNull
-	@Length(min = 5, max = 120, message = "O tamanho deve ser entre 5 e 200 caracteres")
+	@Length(min = 5, max = 500, message = "O tamanho deve ser entre 5 e 500 caracteres")
 	private String description;
 
 	@NotNull
@@ -31,7 +32,7 @@ public class ProductRequestDto implements Serializable {
 	private Long quantity;
 
 	@NotNull
-	@Min(value = 1, message = "preço tem que ser maior que 0 ")
+	@Min(value = 1, message = "preço tem que ser maior que 0")
 	private Double price;
 
 	@NotNull
