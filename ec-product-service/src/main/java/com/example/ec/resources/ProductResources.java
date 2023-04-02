@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,14 +35,14 @@ public class ProductResources {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<?> findById(@PathVariable UUID id) {
-		ProductResponseDto dto = new ProductResponseDto(service.findById(id));
+		ProductResponseDto dto = service.buildProductResponseDto(service.findById(id));
 		return ResponseEntity.ok().body(dto);
 	}
 
 	@GetMapping
 	public ResponseEntity<?> finAll(
 			@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable) {
-		Page<ProductResponseDto> dtos = service.findAll(pageable).map(ProductResponseDto::new);
+		Page<ProductResponseDto> dtos = service.findAll(pageable).map(p -> service.buildProductResponseDto(p));
 		return ResponseEntity.ok().body(dtos);
 	}
 
@@ -50,7 +51,7 @@ public class ProductResources {
 		ProductModel entity = service.buildProductModel(dto);
 		service.save(entity);
 		var uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(entity.getId()).toUri();
-		return ResponseEntity.created(uri).build();
+		return ResponseEntity.status(HttpStatus.CREATED).body(uri);
 	}
 
 	@PutMapping("/{id}")

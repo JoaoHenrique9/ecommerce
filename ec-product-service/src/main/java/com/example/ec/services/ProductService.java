@@ -2,25 +2,23 @@ package com.example.ec.services;
 
 import java.util.UUID;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.ec.dtos.product.ProductRequestDto;
+import com.example.ec.dtos.product.ProductResponseDto;
 import com.example.ec.exception.ObjectNotFoundException;
 import com.example.ec.models.ProductModel;
 import com.example.ec.repositories.ProductRepository;
+import com.example.ec.utils.ObjectMapperUtils;
 
 @Service
 public class ProductService {
 
 	@Autowired
 	private ProductRepository repository;
-
-	@Autowired
-	ModelMapper modelMapper;
 
 	public ProductModel findById(UUID id) {
 		return repository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Produto não encontrado"));
@@ -46,11 +44,15 @@ public class ProductService {
 	}
 
 	public ProductModel buildProductModel(ProductRequestDto dto) {
-		return modelMapper.map(dto, ProductModel.class);
+		return ObjectMapperUtils.map(dto, ProductModel.class);
+	}
+	
+	public ProductResponseDto  buildProductResponseDto(ProductModel  entity) {
+		return ObjectMapperUtils.map(entity, ProductResponseDto.class);
 	}
 	
 	public void buildProductModel(ProductModel entity, ProductModel newEntity) {
-		modelMapper.map(entity, newEntity);
+		ObjectMapperUtils.map(entity, newEntity);
 	}
 
 }
