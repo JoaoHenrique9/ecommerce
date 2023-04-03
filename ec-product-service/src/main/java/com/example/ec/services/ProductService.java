@@ -1,24 +1,23 @@
 package com.example.ec.services;
 
-import java.util.UUID;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
 import com.example.ec.dtos.product.ProductRequestDto;
 import com.example.ec.dtos.product.ProductResponseDto;
 import com.example.ec.exception.ObjectNotFoundException;
 import com.example.ec.models.ProductModel;
 import com.example.ec.repositories.ProductRepository;
 import com.example.ec.utils.ObjectMapperUtils;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class ProductService {
 
-	@Autowired
-	private ProductRepository repository;
+	private final ProductRepository repository;
 
 	public ProductModel findById(UUID id) {
 		return repository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Produto não encontrado"));
