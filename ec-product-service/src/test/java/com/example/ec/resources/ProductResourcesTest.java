@@ -1,6 +1,7 @@
 package com.example.ec.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,6 +36,8 @@ class ProductResourcesTest {
 
 	private static final UUID RANDOM_UUID = UUID.randomUUID();
 	private static final String JOHN_WICK = "John Wick";
+	private static final String PRODUCT_RESOURCE_PATH = "/products/";
+	private static final String LOCALHOST = "http://localhost";
 
 	private ProductResources productResources;
 
@@ -88,9 +91,9 @@ class ProductResourcesTest {
 	void shouldSave() {
 		var productModel = createProductModel();
 		var productRequestDto = createProductRequesteDto();
-		var request = new MockHttpServletRequest("POST","/product/");
+		var request = new MockHttpServletRequest("POST","/products/");
 	    RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
-	    var expectedUri = URI.create("http://localhost/product/" + RANDOM_UUID);
+	    var expectedUri = URI.create(LOCALHOST + PRODUCT_RESOURCE_PATH + RANDOM_UUID);
 		
 		when(productService.buildProductModel(productRequestDto)).thenReturn(productModel);
 		when(productService.save(productModel)).thenReturn(productModel);
@@ -102,6 +105,38 @@ class ProductResourcesTest {
 	    
 	    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 	    assertThat(response.getHeaders().getLocation()).isEqualTo(expectedUri);
+	}
+	
+	@Test
+	void shouldUpdate() {
+		var id = RANDOM_UUID;
+		var model = createProductModel();
+		var RequestDto = createProductRequesteDto();
+		
+		when(productService.buildProductModel(RequestDto)).thenReturn(model);
+		when(productService.update(model)).thenReturn(model);
+		
+		var response = productResources.update(id,RequestDto);
+	
+		verify(productService).buildProductModel(RequestDto);
+	    verify(productService).update(model);
+	    
+	    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+	
+	}
+	
+	@Test
+	void shouldDelete() {
+		var id = RANDOM_UUID;
+	
+		doNothing().when(productService).delete(id);
+		
+		var response = productResources.delete(id);
+		
+	    verify(productService).delete(id);
+	    
+	    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+	
 	}
 	
 
