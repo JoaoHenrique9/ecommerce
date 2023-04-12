@@ -2,6 +2,8 @@ package com.example.ec.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -61,7 +63,6 @@ class ProductServiceTest {
 		assertThatThrownBy(() -> productService.findById(id))
 				.isInstanceOf(ObjectNotFoundException.class)
 				.hasMessageContaining("Produto não encontrado");
-
 	}
 
 	@Test
@@ -73,8 +74,55 @@ class ProductServiceTest {
 
 		var actualProductModelPageableList = productService.findAll(pageable);
 
+		verify(repository).findAll(pageable);
+	 
 		assertThat(actualProductModelPageableList).usingRecursiveComparison().isEqualTo(expectedProductModelPageableList);
+	}
+	
+	@Test
+	void shouldSave() {
+		var productModel = createProductModel();
+		var expectedProductModel = createProductModel();
+		
+		when(repository.save(productModel)).thenReturn(expectedProductModel);
 
+		var actualProductModel = productService.save(productModel);
+
+		verify(repository).save(productModel);
+	 
+		assertThat(actualProductModel).usingRecursiveComparison().isEqualTo(expectedProductModel);
+	}
+	
+	@Test
+	void shouldDelete() {
+		var id = RANDOM_UUID;
+		var productModel = createProductModel();
+		
+		when(repository.findById(id)).thenReturn(Optional.of(productModel));
+		doNothing().when(repository).delete(productModel);
+
+		productService.delete(id);
+
+        verify(repository).delete(productModel);
+	}
+	
+	@Test
+	void shouldUpdate() {
+		var id = RANDOM_UUID;
+		var productModel = createProductModel();
+		var updatedProductModel = createProductModel();
+		
+		 when(repository.findById(id)).thenReturn(Optional.of(productModel));
+		 when(repository.save(productModel)).thenReturn(productModel);
+
+		var result = productService.update(updatedProductModel);
+
+		verify(repository).findById(productModel.getId());
+	    verify(repository).save(productModel);
+	    
+	    assertThat(result).isNotNull();
+	    assertThat(result.getId()).isEqualTo(productModel.getId());
+	    assertThat(result.getName()).isEqualTo(updatedProductModel.getName());
 	}
 
 	private static ProductModel createProductModel() {
