@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("product")
+@RequestMapping("products")
 public class ProductResources {
 
 	private final ProductService service;

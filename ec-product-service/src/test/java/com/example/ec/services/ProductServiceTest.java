@@ -12,8 +12,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
@@ -32,6 +34,7 @@ class ProductServiceTest {
 	private static final UUID RANDOM_UUID = UUID.randomUUID();
 	private static final String JOHN_WICK = "John Wick";
 
+	@InjectMocks
 	private ProductService productService;
 
 	@Mock
@@ -43,10 +46,10 @@ class ProductServiceTest {
 	}
 
 	@Test
+	@DisplayName("Find product by id")
 	void shouldFindById() {
 		var id = RANDOM_UUID;
 		var expectedProductModel = createProductModel();
-
 		when(repository.findById(id)).thenReturn(Optional.of(expectedProductModel));
 
 		var actualProductModel = productService.findById(id);
@@ -55,9 +58,9 @@ class ProductServiceTest {
 	}
 
 	@Test
+	@DisplayName("Throw ObjectNotFoundException when product not found by id")
 	void shouldThrowObjectNotFoundExceptionWhenFindById() {
 		var id = RANDOM_UUID;
-
 		when(repository.findById(id)).thenReturn(Optional.empty());
 
 		assertThatThrownBy(() -> productService.findById(id))
@@ -66,77 +69,70 @@ class ProductServiceTest {
 	}
 
 	@Test
+	@DisplayName("Find all products")
 	void shouldFindAll() {
 		var expectedProductModelPageableList = createProductModelPageableList();
 		var pageable = createPageable();
-
 		when(repository.findAll(pageable)).thenReturn(expectedProductModelPageableList);
 
 		var actualProductModelPageableList = productService.findAll(pageable);
 
 		verify(repository).findAll(pageable);
-	 
-		assertThat(actualProductModelPageableList).usingRecursiveComparison().isEqualTo(expectedProductModelPageableList);
+		assertThat(actualProductModelPageableList).usingRecursiveComparison()
+				.isEqualTo(expectedProductModelPageableList);
 	}
-	
+
 	@Test
-	void shouldSave() {
+	@DisplayName("Save a product")
+	void shouldSaveNewProduct() {
 		var productModel = createProductModel();
 		var expectedProductModel = createProductModel();
-		
 		when(repository.save(productModel)).thenReturn(expectedProductModel);
 
 		var actualProductModel = productService.save(productModel);
 
 		verify(repository).save(productModel);
-	 
 		assertThat(actualProductModel).usingRecursiveComparison().isEqualTo(expectedProductModel);
 	}
-	
+
 	@Test
-	void shouldDelete() {
+	@DisplayName("Delete a product")
+	void shouldDeleteProduct() {
 		var id = RANDOM_UUID;
 		var productModel = createProductModel();
-		
 		when(repository.findById(id)).thenReturn(Optional.of(productModel));
 		doNothing().when(repository).delete(productModel);
 
 		productService.delete(id);
 
-        verify(repository).delete(productModel);
+		verify(repository).delete(productModel);
 	}
-	
+
 	@Test
-	void shouldUpdate() {
+	@DisplayName("Update a product")
+	void shouldUpdateProduct() {
 		var id = RANDOM_UUID;
 		var productModel = createProductModel();
 		var updatedProductModel = createProductModel();
-		
-		 when(repository.findById(id)).thenReturn(Optional.of(productModel));
-		 when(repository.save(productModel)).thenReturn(productModel);
+		when(repository.findById(id)).thenReturn(Optional.of(productModel));
+		when(repository.save(productModel)).thenReturn(productModel);
 
 		var result = productService.update(updatedProductModel);
 
 		verify(repository).findById(productModel.getId());
-	    verify(repository).save(productModel);
-	    
-	    assertThat(result).isNotNull();
-	    assertThat(result.getId()).isEqualTo(productModel.getId());
-	    assertThat(result.getName()).isEqualTo(updatedProductModel.getName());
+		verify(repository).save(productModel);
+
+		assertThat(result).isNotNull();
+		assertThat(result.getId()).isEqualTo(productModel.getId());
+		assertThat(result.getName()).isEqualTo(updatedProductModel.getName());
 	}
 
 	private static ProductModel createProductModel() {
-		var productModel = new ProductModel();
-		productModel.setId(RANDOM_UUID);
-		productModel.setName(JOHN_WICK);
-		return productModel;
+		return new ProductModel(RANDOM_UUID, JOHN_WICK);
 	}
 
 	private static List<ProductModel> createProductModelList() {
-		var productModel = new ProductModel();
-		productModel.setId(RANDOM_UUID);
-		productModel.setName(JOHN_WICK);
-		return Arrays.asList(productModel);
+		return Arrays.asList(createProductModel());
 
 	}
 

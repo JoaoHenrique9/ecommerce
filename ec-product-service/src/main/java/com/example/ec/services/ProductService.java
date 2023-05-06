@@ -22,20 +22,20 @@ public class ProductService {
 	public ProductModel findById(UUID id) {
 		return repository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Produto não encontrado"));
 	}
-	
-	 public Page<ProductModel> findAll(Pageable pageable) {
-	        return repository.findAll(pageable);
-	    }
-	
+
+	public Page<ProductModel> findAll(Pageable pageable) {
+		return repository.findAll(pageable);
+	}
+
 	public ProductModel save(ProductModel entity) {
 		return repository.save(entity);
 	}
-	
+
 	public void delete(UUID id) {
 		ProductModel entity = findById(id);
 		repository.delete(entity);
 	}
-	
+
 	public ProductModel update(ProductModel entity) {
 		ProductModel newEntity =  findById(entity.getId());
 		buildProductModel(entity, newEntity);
