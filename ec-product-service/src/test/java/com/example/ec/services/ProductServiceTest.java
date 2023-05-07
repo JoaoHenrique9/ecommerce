@@ -86,6 +86,21 @@ class ProductServiceTest {
 	}
 
 	@Test
+	void shouldFindAllProductsByCategory() {
+		UUID categoryId = RANDOM_UUID;
+		Pageable pageable = createPageable();
+		List<ProductModel> productList = createProductModelList();
+
+		Page<ProductModel> expectedPage = new PageImpl<>(productList, pageable, productList.size());
+
+		when(repository.findByCategoryId(pageable, categoryId)).thenReturn(expectedPage);
+
+		Page<ProductModel> resultPage = productService.findAllByCategory(pageable, categoryId);
+
+		assertThat(resultPage).isEqualTo(expectedPage);
+	}
+
+	@Test
 	@DisplayName("Save a product")
 	void shouldSaveNewProduct() {
 		var productModel = createProductModel();

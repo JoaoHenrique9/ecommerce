@@ -29,6 +29,10 @@ public class ProductService {
 		return repository.findAll(pageable);
 	}
 
+	public Page<ProductModel> findAllByCategory(Pageable pageable, UUID categoryId) {
+		return repository.findByCategoryId(pageable, categoryId);
+	}
+
 	public ProductModel save(ProductModel entity) {
 		return repository.save(entity);
 	}

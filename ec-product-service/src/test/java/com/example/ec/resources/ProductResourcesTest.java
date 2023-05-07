@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -137,6 +139,30 @@ class ProductResourcesTest {
 		verify(productService).delete(id);
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+	}
+
+	@Test
+	public void shouldFindAllProductsByCategory() {
+
+		UUID categoryId = RANDOM_UUID;
+		Pageable pageable = createPageable();
+
+		List<ProductModel> productList = Arrays.asList(createProductModel());
+
+		Page<ProductModel> productPage = createProductModelPageableList(createProductModel());
+
+		when(productService.findAllByCategory(pageable, categoryId)).thenReturn(productPage);
+
+		List<ProductResponseDto> expectedDtos = productList.stream()
+				.map(productService::buildProductResponseDto)
+				.collect(Collectors.toList());
+
+		ResponseEntity<Page<ProductResponseDto>> response = productResources.findAllByCategory(pageable, categoryId);
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getBody()).isNotNull();
+		assertThat(response.getBody().getContent()).isEqualTo(expectedDtos);
 
 	}
 

@@ -47,7 +47,7 @@ public class ProductModel implements Serializable {
 	private String description;
 
 	@Column(nullable = false)
-	private Long quantity;
+	private Integer quantity;
 
 	@Column(nullable = false)
 	private Double price;
@@ -70,7 +70,7 @@ public class ProductModel implements Serializable {
 		this.name = name;
 	}
 
-	public ProductModel(UUID id, String name, String description, Long quantity, Double price) {
+	public ProductModel(UUID id, String name, String description, Integer quantity, Double price) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
