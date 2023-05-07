@@ -1,17 +1,19 @@
 package com.example.ec.services;
 
+import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import com.example.ec.dtos.product.ProductRequestDto;
 import com.example.ec.dtos.product.ProductResponseDto;
 import com.example.ec.exception.ObjectNotFoundException;
 import com.example.ec.models.ProductModel;
 import com.example.ec.repositories.ProductRepository;
 import com.example.ec.utils.ObjectMapperUtils;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +39,7 @@ public class ProductService {
 	}
 
 	public ProductModel update(ProductModel entity) {
-		ProductModel newEntity =  findById(entity.getId());
+		ProductModel newEntity = findById(entity.getId());
 		buildProductModel(entity, newEntity);
 		return repository.save(newEntity);
 	}
@@ -45,11 +47,11 @@ public class ProductService {
 	public ProductModel buildProductModel(ProductRequestDto dto) {
 		return ObjectMapperUtils.map(dto, ProductModel.class);
 	}
-	
-	public ProductResponseDto  buildProductResponseDto(ProductModel  entity) {
+
+	public ProductResponseDto buildProductResponseDto(ProductModel entity) {
 		return ObjectMapperUtils.map(entity, ProductResponseDto.class);
 	}
-	
+
 	public void buildProductModel(ProductModel entity, ProductModel newEntity) {
 		ObjectMapperUtils.map(entity, newEntity);
 	}

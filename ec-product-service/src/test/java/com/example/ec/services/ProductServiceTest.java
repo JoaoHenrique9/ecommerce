@@ -2,6 +2,7 @@ package com.example.ec.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -24,6 +25,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import com.example.ec.dtos.product.ProductRequestDto;
 import com.example.ec.exception.ObjectNotFoundException;
 import com.example.ec.models.ProductModel;
 import com.example.ec.repositories.ProductRepository;
@@ -33,6 +35,7 @@ class ProductServiceTest {
 
 	private static final UUID RANDOM_UUID = UUID.randomUUID();
 	private static final String JOHN_WICK = "John Wick";
+	private static final String MORPHEUS = "Morpheus";
 
 	@InjectMocks
 	private ProductService productService;
@@ -113,7 +116,7 @@ class ProductServiceTest {
 	void shouldUpdateProduct() {
 		var id = RANDOM_UUID;
 		var productModel = createProductModel();
-		var updatedProductModel = createProductModel();
+		var updatedProductModel = updatedProductModel();
 		when(repository.findById(id)).thenReturn(Optional.of(productModel));
 		when(repository.save(productModel)).thenReturn(productModel);
 
@@ -127,13 +130,33 @@ class ProductServiceTest {
 		assertThat(result.getName()).isEqualTo(updatedProductModel.getName());
 	}
 
+	@Test
+	@DisplayName("MapDto to ProductModel")
+	void shouldMapDtoToProductModel() {
+		ProductRequestDto dto = createProductRequestDto();
+
+		ProductModel result = productService.buildProductModel(dto);
+
+		assertEquals(dto.getName(), result.getName());
+		assertEquals(dto.getDescription(), result.getDescription());
+		assertEquals(dto.getPrice(), result.getPrice());
+	}
+
 	private static ProductModel createProductModel() {
 		return new ProductModel(RANDOM_UUID, JOHN_WICK);
+	}
+
+	private static ProductModel updatedProductModel() {
+		return new ProductModel(RANDOM_UUID, MORPHEUS);
 	}
 
 	private static List<ProductModel> createProductModelList() {
 		return Arrays.asList(createProductModel());
 
+	}
+
+	private static ProductRequestDto createProductRequestDto() {
+		return ProductRequestDto.builder().name(JOHN_WICK).build();
 	}
 
 	private static Pageable createPageable() {

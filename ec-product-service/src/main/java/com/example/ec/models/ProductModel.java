@@ -2,13 +2,18 @@ package com.example.ec.models;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -21,7 +26,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "product")
+@Table(name = "products")
 @Audited
 @Getter
 @Setter
@@ -56,9 +61,21 @@ public class ProductModel implements Serializable {
 	@Column(name = "updated_at", nullable = false)
 	private Date updatedAt;
 
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "product_categories", joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id"))
+	private List<CategoryModel> categories;
+
 	public ProductModel(UUID id, String name) {
 		this.id = id;
 		this.name = name;
+	}
+
+	public ProductModel(UUID id, String name, String description, Long quantity, Double price) {
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.quantity = quantity;
+		this.price = price;
 	}
 
 	@PreUpdate
@@ -71,5 +88,4 @@ public class ProductModel implements Serializable {
 		updatedAt = new Date();
 		createdAt = new Date();
 	}
-
 }

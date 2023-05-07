@@ -1,10 +1,10 @@
-configuration:  
-  projectName: product-service
-
 server:
   port: 8001
 
 spring:
+  output:
+    ansi:
+      enabled: ALWAYS
   h2:
     console:
       enabled: true

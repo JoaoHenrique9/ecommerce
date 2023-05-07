@@ -49,6 +49,7 @@ public class ProductResources {
 		ProductModel entity = service.buildProductModel(dto);
 		entity.setId(id);
 		service.update(entity);
+
 		return ResponseEntity.noContent().build();
 	}
 
@@ -57,5 +58,4 @@ public class ProductResources {
 		service.delete(id);
 		return ResponseEntity.ok().build();
 	}
-
 }

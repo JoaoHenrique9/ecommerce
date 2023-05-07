@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -59,9 +60,9 @@ class ProductResourcesTest {
 		when(productService.buildProductResponseDto(productModel)).thenCallRealMethod();
 
 		var response = productResources.findById(id);
-		
+
 		verify(productService).buildProductResponseDto(productModel);
-	    verify(productService).findById(id);
+		verify(productService).findById(id);
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(response.getBody()).usingRecursiveComparison().isEqualTo(expectedProductResponseDto);
@@ -81,64 +82,63 @@ class ProductResourcesTest {
 
 		verify(productService).buildProductResponseDto(productModel);
 		verify(productService).findAll(pageable);
-	   
+
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(response.getBody()).usingRecursiveComparison().isEqualTo(expectedProductResponseDtoList);
 	}
-	
-	
+
 	@Test
 	void shouldSave() {
 		var productModel = createProductModel();
 		var productRequestDto = createProductRequesteDto();
-		var request = new MockHttpServletRequest("POST","/products/");
-	    RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
-	    var expectedUri = URI.create(LOCALHOST + PRODUCT_RESOURCE_PATH + RANDOM_UUID);
-		
+		var request = new MockHttpServletRequest("POST", "/products/");
+		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+		var expectedUri = URI.create(LOCALHOST + PRODUCT_RESOURCE_PATH + RANDOM_UUID);
+
 		when(productService.buildProductModel(productRequestDto)).thenReturn(productModel);
 		when(productService.save(productModel)).thenReturn(productModel);
-		
+
 		var response = productResources.save(productRequestDto);
-	
+
 		verify(productService).buildProductModel(productRequestDto);
-	    verify(productService).save(productModel);
-	    
-	    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-	    assertThat(response.getHeaders().getLocation()).isEqualTo(expectedUri);
+		verify(productService).save(productModel);
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+		assertThat(response.getHeaders().getLocation()).isEqualTo(expectedUri);
 	}
-	
+
 	@Test
 	void shouldUpdate() {
 		var id = RANDOM_UUID;
-		var model = createProductModel();
+		var model = createProductModelWithoutId();
 		var RequestDto = createProductRequesteDto();
-		
+
 		when(productService.buildProductModel(RequestDto)).thenReturn(model);
 		when(productService.update(model)).thenReturn(model);
-		
-		var response = productResources.update(id,RequestDto);
-	
+
+		var response = productResources.update(id, RequestDto);
+
 		verify(productService).buildProductModel(RequestDto);
-	    verify(productService).update(model);
-	    
-	    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-	
+		verify(productService)
+				.update(Mockito.assertArg((modelToUpdate) -> assertThat(modelToUpdate.getId()).isEqualTo(id)));
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
 	}
-	
+
 	@Test
 	void shouldDelete() {
 		var id = RANDOM_UUID;
-	
+
 		doNothing().when(productService).delete(id);
-		
+
 		var response = productResources.delete(id);
-		
-	    verify(productService).delete(id);
-	    
-	    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-	
+
+		verify(productService).delete(id);
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
 	}
-	
 
 	private static ProductModel createProductModel() {
 		var productModel = new ProductModel();
@@ -147,20 +147,26 @@ class ProductResourcesTest {
 		return productModel;
 	}
 
+	private static ProductModel createProductModelWithoutId() {
+		var productModel = new ProductModel();
+		productModel.setName(JOHN_WICK);
+		return productModel;
+	}
+
 	private static ProductResponseDto createProductResponseDto() {
 		return ProductResponseDto.builder().id(RANDOM_UUID).name(JOHN_WICK).build();
 	}
-	
+
 	private static ProductRequestDto createProductRequesteDto() {
 		return ProductRequestDto.builder().name(JOHN_WICK).build();
 	}
 
 	private Page<ProductResponseDto> createProductResponseDtoList() {
 		var productResponseDtoList = new ArrayList<ProductResponseDto>();
-	    productResponseDtoList.add(createProductResponseDto());
-	    return new PageImpl<>(productResponseDtoList);
+		productResponseDtoList.add(createProductResponseDto());
+		return new PageImpl<>(productResponseDtoList);
 	}
-	
+
 	private static List<ProductModel> createProductModelList(ProductModel model) {
 		return Arrays.asList(model);
 
@@ -172,7 +178,7 @@ class ProductResourcesTest {
 		Sort sort = Sort.by("createdAt").descending();
 		return PageRequest.of(page, size, sort);
 	}
-	
+
 	private Page<ProductModel> createProductModelPageableList(ProductModel model) {
 		return new PageImpl<>(createProductModelList(model));
 	}

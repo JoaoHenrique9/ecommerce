@@ -1,11 +1,14 @@
 package com.example.ec.dtos.product;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
+
+import com.example.ec.dtos.category.CategoryIdRequestDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,5 +42,7 @@ public class ProductRequestDto implements Serializable {
 
 	@NotNull
 	private Boolean isEnabled;
+
+	private List<CategoryIdRequestDto> categories;
 
 }
