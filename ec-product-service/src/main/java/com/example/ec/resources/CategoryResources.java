@@ -21,8 +21,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.ec.dtos.category.CategoryRequestDto;
 import com.example.ec.dtos.category.CategoryResponseDto;
+import com.example.ec.dtos.product.ProductResponseDto;
 import com.example.ec.models.CategoryModel;
 import com.example.ec.services.CategoryService;
+import com.example.ec.services.ProductService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,6 +34,8 @@ import lombok.RequiredArgsConstructor;
 public class CategoryResources {
 
     private final CategoryService service;
+
+    private final ProductService productService;
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponseDto> findById(@PathVariable UUID id) {
@@ -66,6 +70,14 @@ public class CategoryResources {
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         service.delete(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/products")
+    public ResponseEntity<Page<ProductResponseDto>> findAllByCategory(
+            @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable,
+            @PathVariable UUID id) {
+        var dtos = productService.findAllByCategory(pageable, id).map(productService::buildProductResponseDto);
+        return ResponseEntity.ok().body(dtos);
     }
 
 }

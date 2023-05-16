@@ -69,11 +69,4 @@ public class ProductResources {
 		return ResponseEntity.ok().build();
 	}
 
-	@GetMapping("/category/{id}")
-	public ResponseEntity<Page<ProductResponseDto>> findAllByCategory(
-			@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable,
-			@PathVariable UUID id) {
-		Page<ProductResponseDto> dtos = service.findAllByCategory(pageable, id).map(service::buildProductResponseDto);
-		return ResponseEntity.ok().body(dtos);
-	}
 }

@@ -8,7 +8,9 @@ import static org.mockito.Mockito.when;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,19 +18,24 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.example.ec.dtos.category.CategoryRequestDto;
 import com.example.ec.dtos.category.CategoryResponseDto;
+import com.example.ec.dtos.product.ProductResponseDto;
 import com.example.ec.models.CategoryModel;
+import com.example.ec.models.ProductModel;
 import com.example.ec.services.CategoryService;
+import com.example.ec.services.ProductService;
 
 @ExtendWith(MockitoExtension.class)
 class CategoryResourcesTest {
@@ -43,9 +50,13 @@ class CategoryResourcesTest {
 	@Mock
 	private CategoryService categoryService;
 
+	@Mock
+	private ProductService productService;
+
 	@BeforeEach
 	void setUp() {
-		categoryResources = new CategoryResources(categoryService);
+		categoryResources = new CategoryResources(categoryService, productService);
+
 	}
 
 	@Test
@@ -138,12 +149,49 @@ class CategoryResourcesTest {
 
 	}
 
+	@Test
+	public void shouldFindAllProductsByCategory() {
+
+		UUID categoryId = RANDOM_UUID;
+		Pageable pageable = createPageable();
+
+		List<ProductModel> productList = Arrays.asList(createProductModel());
+
+		Page<ProductModel> productPage = new PageImpl<>(Arrays.asList(createProductModel()));
+
+		when(productService.findAllByCategory(pageable, categoryId)).thenReturn(productPage);
+
+		List<ProductResponseDto> expectedDtos = productList.stream()
+				.map(productService::buildProductResponseDto)
+				.collect(Collectors.toList());
+
+		ResponseEntity<Page<ProductResponseDto>> response = categoryResources.findAllByCategory(pageable, categoryId);
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getBody()).isNotNull();
+		assertThat(response.getBody().getContent()).isEqualTo(expectedDtos);
+
+	}
+
 	private static CategoryModel createCategoryModel() {
 		return CategoryModel.builder()
 				.id(RANDOM_UUID)
 				.name(CATEGORY_NAME)
 				.createdAt(new Date())
 				.updatedAt(new Date())
+				.build();
+	}
+
+	private static ProductModel createProductModel() {
+		return ProductModel.builder()
+				.id(RANDOM_UUID)
+				.name("John Wick")
+				.description(
+						"A Smart TV LG 55 Polegadas oferece uma experiência imersiva com sua tela de alta resolução e recursos inteligentes.")
+				.price(2900d)
+				.quantity(10L)
+				.isEnabled(true)
+				.categories(Arrays.asList(createCategoryModel()))
 				.build();
 	}
 
