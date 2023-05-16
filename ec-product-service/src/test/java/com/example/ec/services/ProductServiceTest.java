@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import com.example.ec.dtos.category.CategoryIdRequestDto;
 import com.example.ec.dtos.product.ProductRequestDto;
 import com.example.ec.exception.ObjectNotFoundException;
 import com.example.ec.models.ProductModel;
@@ -74,7 +76,7 @@ class ProductServiceTest {
 	@Test
 	@DisplayName("Find all products")
 	void shouldFindAll() {
-		var expectedProductModelPageableList = createProductModelPageableList();
+		var expectedProductModelPageableList = new PageImpl<ProductModel>(Arrays.asList(createProductModel()));
 		var pageable = createPageable();
 		when(repository.findAll(pageable)).thenReturn(expectedProductModelPageableList);
 
@@ -89,7 +91,7 @@ class ProductServiceTest {
 	void shouldFindAllProductsByCategory() {
 		UUID categoryId = RANDOM_UUID;
 		Pageable pageable = createPageable();
-		List<ProductModel> productList = createProductModelList();
+		List<ProductModel> productList = Arrays.asList(createProductModel());
 
 		Page<ProductModel> expectedPage = new PageImpl<>(productList, pageable, productList.size());
 
@@ -158,20 +160,44 @@ class ProductServiceTest {
 	}
 
 	private static ProductModel createProductModel() {
-		return new ProductModel(RANDOM_UUID, JOHN_WICK);
+		return ProductModel.builder()
+				.id(RANDOM_UUID)
+				.name(JOHN_WICK)
+				.description(
+						"A Smart TV LG 55 Polegadas oferece uma experiência imersiva com sua tela de alta resolução e recursos inteligentes.")
+				.price(2900d)
+				.quantity(10L)
+				.isEnabled(true)
+				.createdAt(new Date())
+				.updatedAt(new Date())
+				.build();
 	}
 
 	private static ProductModel updatedProductModel() {
-		return new ProductModel(RANDOM_UUID, MORPHEUS);
-	}
-
-	private static List<ProductModel> createProductModelList() {
-		return Arrays.asList(createProductModel());
-
+		return ProductModel.builder()
+				.id(RANDOM_UUID)
+				.name(MORPHEUS)
+				.description(
+						"A Smart TV LG 55 Polegadas oferece uma experiência imersiva com sua tela de alta resolução e recursos inteligentes.")
+				.price(2900d)
+				.quantity(10L)
+				.isEnabled(true)
+				.createdAt(new Date())
+				.updatedAt(new Date())
+				.build();
 	}
 
 	private static ProductRequestDto createProductRequestDto() {
-		return ProductRequestDto.builder().name(JOHN_WICK).build();
+		return ProductRequestDto.builder()
+				.name(JOHN_WICK)
+				.description(
+						"A Smart TV LG 55 Polegadas oferece uma experiência imersiva com sua tela de alta resolução e recursos inteligentes.")
+				.price(2900d)
+				.quantity(10L)
+				.isEnabled(true)
+				.categories(Arrays.asList(
+						createCategoryIdRequestDto()))
+				.build();
 	}
 
 	private static Pageable createPageable() {
@@ -181,7 +207,7 @@ class ProductServiceTest {
 		return PageRequest.of(page, size, sort);
 	}
 
-	private Page<ProductModel> createProductModelPageableList() {
-		return new PageImpl<ProductModel>(createProductModelList());
+	private static CategoryIdRequestDto createCategoryIdRequestDto() {
+		return new CategoryIdRequestDto(RANDOM_UUID);
 	}
 }

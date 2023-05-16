@@ -17,7 +17,6 @@ import org.hibernate.envers.RevisionTimestamp;
 
 import com.example.ec.services.EntityRevisionListener;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,14 +26,13 @@ import lombok.Setter;
 @Table(name = "REVINFO")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class Revision implements Serializable{
-    
-	private static final long serialVersionUID = 1L;
+public class Revision implements Serializable {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @RevisionNumber
     @Column(name = "rev")
     private Long revisionId;
@@ -46,4 +44,3 @@ public class Revision implements Serializable{
     @Column(name = "user_id", columnDefinition = "uuid")
     private UUID user;
 }
-

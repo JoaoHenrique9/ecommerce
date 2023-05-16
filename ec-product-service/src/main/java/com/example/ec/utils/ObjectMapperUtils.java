@@ -1,9 +1,5 @@
 package com.example.ec.utils;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.modelmapper.convention.MatchingStrategies;
@@ -25,8 +21,8 @@ public class ObjectMapperUtils {
 	/**
 	 * Hide from public usage.
 	 */
-	private ObjectMapperUtils() {
-	}
+	// private ObjectMapperUtils() {
+	// }
 
 	/**
 	 * <p>
@@ -54,9 +50,11 @@ public class ObjectMapperUtils {
 	 * @param <T>        type of entity in <code>entityList</code>
 	 * @return list of mapped object with <code><D></code> type.
 	 */
-	public static <D, T> List<D> mapAll(final Collection<T> entityList, Class<D> outCLass) {
-		return entityList.stream().map(entity -> map(entity, outCLass)).collect(Collectors.toList());
-	}
+	// public static <D, T> List<D> mapAll(final Collection<T> entityList, Class<D>
+	// outCLass) {
+	// return entityList.stream().map(entity -> map(entity,
+	// outCLass)).collect(Collectors.toList());
+	// }
 
 	/**
 	 * Maps {@code source} to {@code destination}.

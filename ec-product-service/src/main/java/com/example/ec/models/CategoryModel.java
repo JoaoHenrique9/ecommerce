@@ -15,6 +15,7 @@ import javax.persistence.Table;
 import org.hibernate.envers.Audited;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,6 +27,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class CategoryModel {
 
     @Id
@@ -41,11 +43,6 @@ public class CategoryModel {
 
     @Column(name = "updated_at", nullable = false)
     private Date updatedAt;
-
-    public CategoryModel(UUID id, String name) {
-        this.id = id;
-        this.name = name;
-    }
 
     @PreUpdate
     public void updateTimeStamps() {

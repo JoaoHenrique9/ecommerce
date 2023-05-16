@@ -8,7 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,7 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -74,7 +73,7 @@ class CategoryServiceTest {
 	@Test
 	@DisplayName("Find all categories")
 	void shouldFindAll() {
-		var expectedCategoryModelPageableList = createCategoryModelPageableList();
+		var expectedCategoryModelPageableList = new PageImpl<CategoryModel>(Arrays.asList(createCategoryModel()));
 		var pageable = createPageable();
 		when(repository.findAll(pageable)).thenReturn(expectedCategoryModelPageableList);
 
@@ -145,16 +144,21 @@ class CategoryServiceTest {
 	}
 
 	private static CategoryModel createCategoryModel() {
-		return new CategoryModel(RANDOM_UUID, CATEGORY_NAME);
+		return CategoryModel.builder()
+				.id(RANDOM_UUID)
+				.name(CATEGORY_NAME)
+				.createdAt(new Date())
+				.updatedAt(new Date())
+				.build();
 	}
 
 	private static CategoryModel updatedCategoryModel() {
-		return new CategoryModel(RANDOM_UUID, CATEGORY_NAME_2);
-	}
-
-	private static List<CategoryModel> createCategoryModelList() {
-		return Arrays.asList(createCategoryModel());
-
+		return CategoryModel.builder()
+				.id(RANDOM_UUID)
+				.name(CATEGORY_NAME_2)
+				.createdAt(new Date())
+				.updatedAt(new Date())
+				.build();
 	}
 
 	private static Pageable createPageable() {
@@ -164,7 +168,4 @@ class CategoryServiceTest {
 		return PageRequest.of(page, size, sort);
 	}
 
-	private Page<CategoryModel> createCategoryModelPageableList() {
-		return new PageImpl<CategoryModel>(createCategoryModelList());
-	}
 }

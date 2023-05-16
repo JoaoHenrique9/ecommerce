@@ -6,8 +6,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,8 +29,11 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.example.ec.dtos.category.CategoryIdRequestDto;
+import com.example.ec.dtos.category.CategoryResponseDto;
 import com.example.ec.dtos.product.ProductRequestDto;
 import com.example.ec.dtos.product.ProductResponseDto;
+import com.example.ec.models.CategoryModel;
 import com.example.ec.models.ProductModel;
 import com.example.ec.services.ProductService;
 
@@ -73,9 +76,9 @@ class ProductResourcesTest {
 	@Test
 	void shouldFindAll() {
 		var productModel = createProductModel();
-		var productModelPageableList = createProductModelPageableList(productModel);
+		var productModelPageableList = new PageImpl<>(Arrays.asList(productModel));
 		var pageable = createPageable();
-		var expectedProductResponseDtoList = createProductResponseDtoList();
+		var expectedProductResponseDtoList = new PageImpl<>(Arrays.asList(createProductResponseDto()));
 
 		when(productService.findAll(pageable)).thenReturn(productModelPageableList);
 		when(productService.buildProductResponseDto(productModel)).thenCallRealMethod();
@@ -150,7 +153,7 @@ class ProductResourcesTest {
 
 		List<ProductModel> productList = Arrays.asList(createProductModel());
 
-		Page<ProductModel> productPage = createProductModelPageableList(createProductModel());
+		Page<ProductModel> productPage = new PageImpl<>(Arrays.asList(createProductModel()));
 
 		when(productService.findAllByCategory(pageable, categoryId)).thenReturn(productPage);
 
@@ -167,10 +170,16 @@ class ProductResourcesTest {
 	}
 
 	private static ProductModel createProductModel() {
-		var productModel = new ProductModel();
-		productModel.setId(RANDOM_UUID);
-		productModel.setName(JOHN_WICK);
-		return productModel;
+		return ProductModel.builder()
+				.id(RANDOM_UUID)
+				.name(JOHN_WICK)
+				.description(
+						"A Smart TV LG 55 Polegadas oferece uma experiência imersiva com sua tela de alta resolução e recursos inteligentes.")
+				.price(2900d)
+				.quantity(10L)
+				.isEnabled(true)
+				.categories(Arrays.asList(createCategoryModel()))
+				.build();
 	}
 
 	private static ProductModel createProductModelWithoutId() {
@@ -180,22 +189,29 @@ class ProductResourcesTest {
 	}
 
 	private static ProductResponseDto createProductResponseDto() {
-		return ProductResponseDto.builder().id(RANDOM_UUID).name(JOHN_WICK).build();
+		return ProductResponseDto.builder()
+				.id(RANDOM_UUID)
+				.name(JOHN_WICK)
+				.description(
+						"A Smart TV LG 55 Polegadas oferece uma experiência imersiva com sua tela de alta resolução e recursos inteligentes.")
+				.price(2900d)
+				.quantity(10L)
+				.isEnabled(true)
+				.categories(Arrays.asList(createCategoryResponseDto()))
+				.build();
 	}
 
 	private static ProductRequestDto createProductRequesteDto() {
-		return ProductRequestDto.builder().name(JOHN_WICK).build();
-	}
-
-	private Page<ProductResponseDto> createProductResponseDtoList() {
-		var productResponseDtoList = new ArrayList<ProductResponseDto>();
-		productResponseDtoList.add(createProductResponseDto());
-		return new PageImpl<>(productResponseDtoList);
-	}
-
-	private static List<ProductModel> createProductModelList(ProductModel model) {
-		return Arrays.asList(model);
-
+		return ProductRequestDto.builder()
+				.name(JOHN_WICK)
+				.description(
+						"A Smart TV LG 55 Polegadas oferece uma experiência imersiva com sua tela de alta resolução e recursos inteligentes.")
+				.price(2900d)
+				.quantity(10L)
+				.isEnabled(true)
+				.categories(Arrays.asList(
+						createCategoryIdRequestDto()))
+				.build();
 	}
 
 	private static Pageable createPageable() {
@@ -205,7 +221,20 @@ class ProductResourcesTest {
 		return PageRequest.of(page, size, sort);
 	}
 
-	private Page<ProductModel> createProductModelPageableList(ProductModel model) {
-		return new PageImpl<>(createProductModelList(model));
+	private static CategoryIdRequestDto createCategoryIdRequestDto() {
+		return new CategoryIdRequestDto(RANDOM_UUID);
+	}
+
+	private static CategoryResponseDto createCategoryResponseDto() {
+		return new CategoryResponseDto(RANDOM_UUID, "Eletrônico");
+	}
+
+	private static CategoryModel createCategoryModel() {
+		return CategoryModel.builder()
+				.id(RANDOM_UUID)
+				.name("Eletrônico")
+				.createdAt(new Date())
+				.updatedAt(new Date())
+				.build();
 	}
 }

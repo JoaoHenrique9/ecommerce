@@ -21,6 +21,7 @@ import javax.persistence.Table;
 import org.hibernate.envers.Audited;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,6 +33,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class ProductModel implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -47,7 +49,7 @@ public class ProductModel implements Serializable {
 	private String description;
 
 	@Column(nullable = false)
-	private Integer quantity;
+	private Long quantity;
 
 	@Column(nullable = false)
 	private Double price;
@@ -64,19 +66,6 @@ public class ProductModel implements Serializable {
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "product_categories", joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id"))
 	private List<CategoryModel> categories;
-
-	public ProductModel(UUID id, String name) {
-		this.id = id;
-		this.name = name;
-	}
-
-	public ProductModel(UUID id, String name, String description, Integer quantity, Double price) {
-		this.id = id;
-		this.name = name;
-		this.description = description;
-		this.quantity = quantity;
-		this.price = price;
-	}
 
 	@PreUpdate
 	public void updateTimeStamps() {

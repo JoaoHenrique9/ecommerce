@@ -6,9 +6,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Date;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -71,9 +69,9 @@ class CategoryResourcesTest {
 	@Test
 	void shouldFindAll() {
 		var categoryModel = createCategoryModel();
-		var categoryModelPageableList = createCategoryModelPageableList(categoryModel);
+		var categoryModelPageableList = new PageImpl<>(Arrays.asList(categoryModel));
 		var pageable = createPageable();
-		var expectedCategoryResponseDtoList = createCategoryResponseDtoList();
+		var expectedCategoryResponseDtoList = new PageImpl<>(Arrays.asList(createCategoryResponseDto()));
 
 		when(categoryService.findAll(pageable)).thenReturn(categoryModelPageableList);
 		when(categoryService.buildCategoryResponseDto(categoryModel)).thenCallRealMethod();
@@ -141,16 +139,20 @@ class CategoryResourcesTest {
 	}
 
 	private static CategoryModel createCategoryModel() {
-		var categoryModel = new CategoryModel();
-		categoryModel.setId(RANDOM_UUID);
-		categoryModel.setName(CATEGORY_NAME);
-		return categoryModel;
+		return CategoryModel.builder()
+				.id(RANDOM_UUID)
+				.name(CATEGORY_NAME)
+				.createdAt(new Date())
+				.updatedAt(new Date())
+				.build();
 	}
 
 	private static CategoryModel createCategoryModelWithoutId() {
-		var categoryModel = new CategoryModel();
-		categoryModel.setName(CATEGORY_NAME);
-		return categoryModel;
+		return CategoryModel.builder()
+				.name(CATEGORY_NAME)
+				.createdAt(new Date())
+				.updatedAt(new Date())
+				.build();
 	}
 
 	private static CategoryResponseDto createCategoryResponseDto() {
@@ -161,25 +163,10 @@ class CategoryResourcesTest {
 		return CategoryRequestDto.builder().name(CATEGORY_NAME).build();
 	}
 
-	private Page<CategoryResponseDto> createCategoryResponseDtoList() {
-		var categoryResponseDtoList = new ArrayList<CategoryResponseDto>();
-		categoryResponseDtoList.add(createCategoryResponseDto());
-		return new PageImpl<>(categoryResponseDtoList);
-	}
-
-	private static List<CategoryModel> createCategoryModelList(CategoryModel model) {
-		return Arrays.asList(model);
-
-	}
-
 	private static Pageable createPageable() {
 		int page = 0;
 		int size = 10;
 		Sort sort = Sort.by("createdAt").descending();
 		return PageRequest.of(page, size, sort);
-	}
-
-	private Page<CategoryModel> createCategoryModelPageableList(CategoryModel model) {
-		return new PageImpl<>(createCategoryModelList(model));
 	}
 }
