@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -12,9 +13,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +31,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import com.example.ec.dtos.role.RoleRequestDto;
 import com.example.ec.dtos.user.UserRequestDto;
 import com.example.ec.exception.EmailException;
 import com.example.ec.exception.ObjectNotFoundException;
@@ -67,6 +71,16 @@ public class UserServiceTest {
         var actualUserModel = userService.findById(id);
 
         assertThat(actualUserModel).usingRecursiveComparison().isEqualTo(expectedUserModel);
+
+        assertNotNull(expectedUserModel.getCreatedAt());
+        assertEquals(actualUserModel.getCreatedAt(), expectedUserModel.getCreatedAt());
+        assertNotEquals(actualUserModel.getCreatedAt(), "");
+
+        assertThat(actualUserModel.getRoles())
+                .isNotNull()
+                .isNotEmpty()
+                .containsExactlyInAnyOrderElementsOf(expectedUserModel.getRoles());
+
     }
 
     @Test
@@ -134,17 +148,6 @@ public class UserServiceTest {
         assertThat(result.getName()).isEqualTo(updatedUserModel.getName());
     }
 
-    // @Test
-    // void shouldMapDtoToUserModel() throws EmailException {
-    // UserRequestDto dto = createUserRequestDto();
-
-    // UserModel result = userService.buildUserModel(dto, null);
-
-    // assertEquals(dto.getName(), result.getName());
-    // assertEquals(dto.getEmail(), result.getEmail());
-    // assertEquals(dto.getPassword(), result.getPassword());
-    // }
-
     @Test
     public void shouldBuildUserModel() throws EmailException, PasswordException {
 
@@ -152,13 +155,23 @@ public class UserServiceTest {
 
         UserModel result = userService.buildUserModel(userRequestDto, null);
 
-        assertNotNull(result);
         assertNull(result.getCreatedAt());
-        assertEquals(userRequestDto.getName(), result.getName());
-        assertEquals(userRequestDto.getEmail(), result.getEmail());
-        // assertEquals(StringUtils.encoder(userRequestDto.getPassword()),
-        // result.getPassword());
         assertNotNull(result.getPassword());
+
+        assertThat(result.getEmail()).isNotNull().isNotEmpty();
+        assertThat(result.getName()).isNotNull().isNotEmpty();
+
+        assertThat(result.getRoles().stream().map(Role::getId).collect(Collectors.toSet()))
+                .isEqualTo(userRequestDto.getRoles().stream().map(RoleRequestDto::getId).collect(Collectors.toSet()))
+                .isNotEmpty()
+                .isNotEqualTo("");
+
+        assertThat(result)
+                .isNotNull()
+                .isNotEqualTo("")
+                .extracting(UserModel::getName, UserModel::getEmail)
+                .contains(userRequestDto.getName(), userRequestDto.getEmail());
+
         verify(userRepository).findByEmail(userRequestDto.getEmail());
     }
 
@@ -289,6 +302,7 @@ public class UserServiceTest {
                 .name(JOHN_WICK)
                 .email(JOHN_EMAIL)
                 .password(StringUtils.encoder(PASSWORD))
+                .createdAt(new Date())
                 .roles(new HashSet<Role>(Arrays.asList(createRole())))
                 .build();
     }
@@ -303,6 +317,10 @@ public class UserServiceTest {
                 .build();
     }
 
+    private RoleRequestDto createRoleRequestDto() {
+        return RoleRequestDto.builder().id(1l).build();
+    }
+
     private Role createRole() {
         return Role.builder().id(1l).roleName("ROLE_ADMIN").build();
     }
@@ -312,6 +330,7 @@ public class UserServiceTest {
                 .name(MORPHEUS)
                 .email(MORPHEUS_Email)
                 .password(PASSWORD)
+                .roles(Arrays.asList(createRoleRequestDto()))
                 .build();
     }
 
