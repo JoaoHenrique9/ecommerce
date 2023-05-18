@@ -19,7 +19,7 @@ public final class ObjectMapperUtils {
 	 */
 	static {
 		modelMapper = new ModelMapper();
-		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+		modelMapper.getConfiguration().setSkipNullEnabled(true).setMatchingStrategy(MatchingStrategies.STRICT);
 	}
 
 	/**
