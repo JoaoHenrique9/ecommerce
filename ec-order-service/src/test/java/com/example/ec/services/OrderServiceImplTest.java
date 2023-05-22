@@ -5,10 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.UUID;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,7 +21,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.example.ec.dtos.ProductDto;
 import com.example.ec.dtos.UserDto;
 import com.example.ec.dtos.order.OrderRequestDto;
+import com.example.ec.exceptions.ObjectNotFoundException;
 import com.example.ec.models.OrderModel;
+import com.example.ec.models.enums.OrderStatus;
 import com.example.ec.repositories.OrderRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,14 +35,43 @@ public class OrderServiceImplTest {
     @InjectMocks
     private OrderServiceImpl orderService;
 
+    @BeforeEach
+    void setup() {
+        orderService = new OrderServiceImpl(orderRepository);
+    }
+
     @Test
     public void shouldInsert() {
 
-        OrderModel order = new OrderModel();
+        OrderModel orderModel = createOrderModel();
 
-        orderService.insert(order);
+        orderService.insert(orderModel);
 
-        verify(orderRepository, times(1)).save(order);
+        verify(orderRepository, times(1)).save(orderModel);
+    }
+
+    @Test
+    public void shouldFindById() {
+        String orderId = "123456";
+        OrderModel order = createOrderModel();
+        order.setId(orderId);
+
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+
+        OrderModel result = orderService.findById(orderId);
+
+        assertNotNull(result);
+        assertEquals(orderId, result.getId());
+    }
+
+    @Test
+    void shouldThrowObjectNotFoundExceptionWhenFindById() {
+        var id = "123456";
+        when(orderRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> orderService.findById(id))
+                .isInstanceOf(ObjectNotFoundException.class)
+                .hasMessageContaining("Pedido não encontrado");
     }
 
     @Test
@@ -48,13 +82,6 @@ public class OrderServiceImplTest {
 
         assertNotNull(result);
         assertEquals("Nome do usuario", result.getUser().getName());
-    }
-
-    public void testNullOrderModelThrowsException() {
-
-        assertThatThrownBy(() -> orderService.insert(null))
-                .isInstanceOf(
-                        NullPointerException.class);
     }
 
     private ProductDto createProductDto() {
@@ -76,6 +103,15 @@ public class OrderServiceImplTest {
     private OrderRequestDto createOrderRequestDto() {
         return OrderRequestDto.builder()
                 .products(Arrays.asList(createProductDto()))
+                .user(createUserDto())
+                .build();
+    }
+
+    private OrderModel createOrderModel() {
+        return OrderModel.builder()
+                .id("123456")
+                .products(Arrays.asList(createProductDto()))
+                .orderStatus(OrderStatus.WAITING_PAYMENT)
                 .user(createUserDto())
                 .build();
     }

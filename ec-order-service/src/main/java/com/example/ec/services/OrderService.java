@@ -8,5 +8,7 @@ import jakarta.validation.Valid;
 public interface OrderService {
     void insert(OrderModel order);
 
+    OrderModel findById(String orderId);
+
     OrderModel buildToOrderModel(@Valid OrderRequestDto orderRequestDto);
 }

@@ -30,4 +30,5 @@ public class OrderResponseDto {
         this.products = orderModel.getProducts();
         this.totalPrice = orderModel.getTotalPrice();
     }
+
 }

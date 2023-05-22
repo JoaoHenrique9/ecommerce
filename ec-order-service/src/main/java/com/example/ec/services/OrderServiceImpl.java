@@ -4,6 +4,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import com.example.ec.dtos.order.OrderRequestDto;
+import com.example.ec.exceptions.ObjectNotFoundException;
 import com.example.ec.models.OrderModel;
 import com.example.ec.repositories.OrderRepository;
 
@@ -19,6 +20,12 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void insert(OrderModel order) {
         orderRepository.save(order);
+    }
+
+    @Override
+    public OrderModel findById(String orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new ObjectNotFoundException("Pedido não encontrado"));
     }
 
     @Override

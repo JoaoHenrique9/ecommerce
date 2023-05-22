@@ -10,6 +10,7 @@ import com.example.ec.dtos.UserDto;
 import com.example.ec.models.enums.OrderStatus;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +20,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "orders")
+@Builder
 public class OrderModel {
 
     @Id

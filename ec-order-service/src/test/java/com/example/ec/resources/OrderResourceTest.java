@@ -1,9 +1,14 @@
 package com.example.ec.resources;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +19,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import com.example.ec.dtos.ProductDto;
+import com.example.ec.dtos.UserDto;
 import com.example.ec.dtos.order.OrderRequestDto;
+import com.example.ec.dtos.order.OrderResponseDto;
 import com.example.ec.models.OrderModel;
 import com.example.ec.models.enums.OrderStatus;
 import com.example.ec.services.OrderService;
@@ -29,6 +37,9 @@ public class OrderResourceTest {
     private OrderResource orderResource;
 
     @BeforeEach
+    void setup() {
+        orderResource = new OrderResource(orderService);
+    }
 
     @Test
     public void shouldInsertOrder() {
@@ -43,6 +54,48 @@ public class OrderResourceTest {
         verify(orderService, times(1)).insert(orderModel);
 
         assertEquals(OrderStatus.WAITING_PAYMENT, orderModel.getOrderStatus());
+    }
+
+    @Test
+    public void shouldFindById() {
+
+        String orderId = "123456";
+        OrderModel orderModel = createOrderModel();
+        OrderResponseDto expectedResponse = new OrderResponseDto(orderModel);
+
+        when(orderService.findById(orderId)).thenReturn(orderModel);
+
+        ResponseEntity<OrderResponseDto> response = orderResource.findById(orderId);
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertThat(response.getBody()).usingRecursiveComparison().isEqualTo(expectedResponse);
+
+    }
+
+    private ProductDto createProductDto() {
+        return ProductDto.builder()
+                .id(UUID.randomUUID())
+                .name("Nome do produto")
+                .price(50.0)
+                .quantity(3L)
+                .build();
+    }
+
+    private UserDto createUserDto() {
+        return UserDto.builder()
+                .id(UUID.randomUUID())
+                .name("Nome do usuario")
+                .build();
+    }
+
+    private OrderModel createOrderModel() {
+        return OrderModel.builder()
+                .id("123456")
+                .products(Arrays.asList(createProductDto()))
+                .orderStatus(OrderStatus.WAITING_PAYMENT)
+                .user(createUserDto())
+                .build();
     }
 
 }
