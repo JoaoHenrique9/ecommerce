@@ -4,8 +4,8 @@ server:
 spring:
   data:
     mongodb:
-      uri: "mongodb://localhost:27017/BookstoreDb"
-      database: Ecommerce
+      uri: "mongodb://localhost:27017/ecommerce"
+      database: ecommerce
   output:
     ansi:
       enabled: ALWAYS

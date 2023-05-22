@@ -1,6 +1,5 @@
 package com.example.ec.models;
 
-import java.text.DecimalFormat;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -29,12 +28,9 @@ public class OrderModel {
     private List<ProductDto> products;
 
     public Double getTotalPrice() {
-        double totalPrice = products.stream()
-                .mapToDouble(ProductDto::getPrice)
+        return products.stream()
+                .mapToDouble(ProductDto::getTotalprice)
                 .sum();
-
-        DecimalFormat decimalFormat = new DecimalFormat("#.00");
-        return Double.parseDouble(decimalFormat.format(totalPrice));
     }
 
 }
