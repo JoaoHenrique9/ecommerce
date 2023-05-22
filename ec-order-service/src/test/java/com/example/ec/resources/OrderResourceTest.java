@@ -73,6 +73,19 @@ public class OrderResourceTest {
 
     }
 
+    @Test
+    public void shouldUpdateStatus() {
+
+        String orderId = "123";
+        int status = 2;
+
+        ResponseEntity<Void> response = orderResource.updateStatus(orderId, status);
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(orderService).updateStatus(orderId, OrderStatus.valueOf(status));
+    }
+
     private ProductDto createProductDto() {
         return ProductDto.builder()
                 .id(UUID.randomUUID())

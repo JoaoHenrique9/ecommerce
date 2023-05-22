@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.example.ec.dtos.order.OrderRequestDto;
 import com.example.ec.exceptions.ObjectNotFoundException;
 import com.example.ec.models.OrderModel;
+import com.example.ec.models.enums.OrderStatus;
 import com.example.ec.repositories.OrderRepository;
 
 import jakarta.validation.Valid;
@@ -33,6 +34,13 @@ public class OrderServiceImpl implements OrderService {
         OrderModel order = new OrderModel();
         BeanUtils.copyProperties(orderRequestDto, order);
         return order;
+    }
+
+    @Override
+    public void updateStatus(String orderId, OrderStatus newStatus) {
+        OrderModel order = findById(orderId);
+        order.setOrderStatus(newStatus);
+        orderRepository.save(order);
     }
 
 }

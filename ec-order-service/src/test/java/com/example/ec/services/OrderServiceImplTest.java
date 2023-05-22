@@ -84,6 +84,22 @@ public class OrderServiceImplTest {
         assertEquals("Nome do usuario", result.getUser().getName());
     }
 
+    @Test
+    public void shouldUpdateStatus() {
+
+        String orderId = "123456";
+        OrderModel orderModel = createOrderModel();
+        orderModel.setOrderStatus(OrderStatus.PAID);
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(orderModel));
+
+        OrderStatus newStatus = OrderStatus.PAID;
+        orderService.updateStatus(orderId, newStatus);
+
+        verify(orderRepository).findById(orderId);
+        assertEquals(newStatus, orderModel.getOrderStatus());
+        verify(orderRepository).save(orderModel);
+    }
+
     private ProductDto createProductDto() {
         return ProductDto.builder()
                 .id(UUID.randomUUID())
