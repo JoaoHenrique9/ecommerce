@@ -1,5 +1,8 @@
 package com.example.ec.services;
 
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +44,11 @@ public class OrderServiceImpl implements OrderService {
         OrderModel order = findById(orderId);
         order.setOrderStatus(newStatus);
         orderRepository.save(order);
+    }
+
+    @Override
+    public List<OrderModel> findByUserId(UUID userId) {
+        return orderRepository.findByUserId(userId);
     }
 
 }

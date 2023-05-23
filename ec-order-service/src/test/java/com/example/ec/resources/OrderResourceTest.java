@@ -1,13 +1,14 @@
 package com.example.ec.resources;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -84,6 +85,24 @@ public class OrderResourceTest {
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         verify(orderService).updateStatus(orderId, OrderStatus.valueOf(status));
+    }
+
+    @Test
+    public void shouldFindByUserId() {
+
+        UUID userId = UUID.randomUUID();
+        List<OrderModel> expectedOrders = Arrays.asList(createOrderModel());
+
+        when(orderService.findByUserId(userId)).thenReturn(expectedOrders);
+
+        ResponseEntity<List<OrderResponseDto>> responseEntity = orderResource.findByUserId(userId);
+
+        verify(orderService).findByUserId(userId);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+        assertThat(responseEntity.getBody())
+                .isNotNull()
+                .isNotEqualTo("");
     }
 
     private ProductDto createProductDto() {

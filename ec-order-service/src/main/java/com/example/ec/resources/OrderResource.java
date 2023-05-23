@@ -2,6 +2,9 @@ package com.example.ec.resources;
 
 import static com.example.ec.models.enums.OrderStatus.WAITING_PAYMENT;
 
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,5 +49,11 @@ public class OrderResource {
     public ResponseEntity<Void> updateStatus(@PathVariable String orderId, @PathVariable int status) {
         orderService.updateStatus(orderId, OrderStatus.valueOf(status));
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<OrderResponseDto>> findByUserId(@PathVariable UUID userId) {
+        var orders = orderService.findByUserId(userId).stream().map(OrderResponseDto::new).toList();
+        return ResponseEntity.ok(orders);
     }
 }
