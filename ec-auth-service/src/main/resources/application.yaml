@@ -1,5 +1,5 @@
 server:
-  port: 9000
+  port: 8083
 
 spring:
   output:
@@ -13,6 +13,17 @@ spring:
     url: jdbc:h2:mem:testdb
     username: sa
     password:
+  application:
+    name: auth-service
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client: 
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
 
 jwt:
   secret: 158ba9c386a9eb4a3858c0b310c39d7ad2cd8f427b5b2fddf6f7984e71d96898
