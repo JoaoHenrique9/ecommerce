@@ -1,7 +1,9 @@
 package com.example.ec.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,7 +37,7 @@ import com.example.ec.models.ProductModel;
 import com.example.ec.services.ProductService;
 
 @ExtendWith(MockitoExtension.class)
-class ProductResourcesTest {
+class ProductResourceTest {
 
 	private static final UUID RANDOM_UUID = UUID.randomUUID();
 	private static final String JOHN_WICK = "John Wick";
@@ -43,14 +45,14 @@ class ProductResourcesTest {
 	private static final String LOCALHOST = "http://localhost";
 
 	@InjectMocks
-	private ProductResources productResources;
+	private ProductResource productResources;
 
 	@Mock
 	private ProductService productService;
 
 	@BeforeEach
 	void setUp() {
-		productResources = new ProductResources(productService);
+		productResources = new ProductResource(productService);
 	}
 
 	@Test
@@ -141,6 +143,18 @@ class ProductResourcesTest {
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
+	}
+
+	@Test
+	public void shouldSubtractQuantity() {
+
+		UUID id = RANDOM_UUID;
+		Long quantity = 5L;
+
+		var response = productResources.subtractQuantity(id, quantity);
+
+		verify(productService, times(1)).subtractQuantity(id, quantity);
+		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
 	}
 
 	private static ProductModel createProductModel() {

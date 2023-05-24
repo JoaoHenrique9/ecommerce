@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.ec.dtos.category.CategoryRequestDto;
 import com.example.ec.dtos.category.CategoryResponseDto;
-import com.example.ec.exception.ObjectNotFoundException;
+import com.example.ec.exceptions.ObjectNotFoundException;
 import com.example.ec.models.CategoryModel;
 import com.example.ec.repositories.CategoryRepository;
 import com.example.ec.utils.ObjectMapperUtils;

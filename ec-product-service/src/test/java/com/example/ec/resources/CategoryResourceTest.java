@@ -38,14 +38,14 @@ import com.example.ec.services.CategoryService;
 import com.example.ec.services.ProductService;
 
 @ExtendWith(MockitoExtension.class)
-class CategoryResourcesTest {
+class CategoryResourceTest {
 
 	private static final UUID RANDOM_UUID = UUID.randomUUID();
 	private static final String CATEGORY_NAME = "Eletrônico";
 	private static final String PRODUCT_RESOURCE_PATH = "/categories/";
 	private static final String LOCALHOST = "http://localhost";
 
-	private CategoryResources categoryResources;
+	private CategoryResource categoryResources;
 
 	@Mock
 	private CategoryService categoryService;
@@ -55,7 +55,7 @@ class CategoryResourcesTest {
 
 	@BeforeEach
 	void setUp() {
-		categoryResources = new CategoryResources(categoryService, productService);
+		categoryResources = new CategoryResource(categoryService, productService);
 
 	}
 

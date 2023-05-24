@@ -1,4 +1,4 @@
-package com.example.ec.exception;
+package com.example.ec.exceptions;
 
 import java.io.Serializable;
 

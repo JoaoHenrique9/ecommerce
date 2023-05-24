@@ -1,4 +1,4 @@
-package com.example.ec.exception;
+package com.example.ec.exceptions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;

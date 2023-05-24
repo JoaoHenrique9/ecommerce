@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.example.ec.dtos.product.ProductRequestDto;
 import com.example.ec.dtos.product.ProductResponseDto;
-import com.example.ec.exception.ObjectNotFoundException;
+import com.example.ec.exceptions.ObjectNotFoundException;
+import com.example.ec.exceptions.QuantityException;
 import com.example.ec.models.ProductModel;
 import com.example.ec.repositories.ProductRepository;
 import com.example.ec.utils.ObjectMapperUtils;
@@ -46,6 +47,15 @@ public class ProductService {
 		ProductModel newEntity = findById(entity.getId());
 		buildProductModel(entity, newEntity);
 		return repository.save(newEntity);
+	}
+
+	public void subtractQuantity(UUID id, Long quantity) {
+		ProductModel entity = findById(id);
+		if (quantity > entity.getQuantity())
+			throw new QuantityException("O valor é maior que a quantidade atual");
+		Long result = entity.getQuantity() - quantity;
+		entity.setQuantity(result);
+		repository.save(entity);
 	}
 
 	public ProductModel buildProductModel(ProductRequestDto dto) {

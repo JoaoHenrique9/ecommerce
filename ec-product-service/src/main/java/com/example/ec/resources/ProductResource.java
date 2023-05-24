@@ -3,6 +3,7 @@ package com.example.ec.resources;
 import java.util.UUID;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +12,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,12 +26,13 @@ import com.example.ec.dtos.product.ProductResponseDto;
 import com.example.ec.models.ProductModel;
 import com.example.ec.services.ProductService;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("products")
-public class ProductResources {
+public class ProductResource {
 
 	private final ProductService service;
 
@@ -60,6 +63,13 @@ public class ProductResources {
 		entity.setId(id);
 		service.update(entity);
 
+		return ResponseEntity.noContent().build();
+	}
+
+	@Hidden
+	@PatchMapping("/{id}/subtract-quantity")
+	public ResponseEntity<Void> subtractQuantity(@PathVariable UUID id, @NotEmpty @RequestBody Long quantity) {
+		service.subtractQuantity(id, quantity);
 		return ResponseEntity.noContent().build();
 	}
 

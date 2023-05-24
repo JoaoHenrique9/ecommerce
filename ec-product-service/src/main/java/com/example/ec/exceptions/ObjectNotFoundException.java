@@ -1,4 +1,4 @@
-package com.example.ec.exception;
+package com.example.ec.exceptions;
 
 public class ObjectNotFoundException extends RuntimeException {
 	private static final long serialVersionUID = 1L;

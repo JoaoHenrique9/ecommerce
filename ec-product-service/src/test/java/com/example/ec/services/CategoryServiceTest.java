@@ -25,7 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import com.example.ec.dtos.category.CategoryRequestDto;
-import com.example.ec.exception.ObjectNotFoundException;
+import com.example.ec.exceptions.ObjectNotFoundException;
 import com.example.ec.models.CategoryModel;
 import com.example.ec.repositories.CategoryRepository;
 

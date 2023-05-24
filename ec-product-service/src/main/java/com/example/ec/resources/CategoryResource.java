@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("categories")
-public class CategoryResources {
+public class CategoryResource {
 
     private final CategoryService service;
 

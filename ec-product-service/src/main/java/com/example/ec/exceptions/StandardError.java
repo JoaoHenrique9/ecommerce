@@ -1,4 +1,4 @@
-package com.example.ec.exception;
+package com.example.ec.exceptions;
 
 import java.io.Serializable;
 
@@ -17,6 +17,5 @@ public class StandardError implements Serializable {
 	private String error;
 	private String message;
 	private String path;
-	
-}
 
+}

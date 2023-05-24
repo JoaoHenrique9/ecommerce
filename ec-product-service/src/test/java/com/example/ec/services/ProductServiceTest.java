@@ -28,7 +28,8 @@ import org.springframework.data.domain.Sort;
 
 import com.example.ec.dtos.category.CategoryIdRequestDto;
 import com.example.ec.dtos.product.ProductRequestDto;
-import com.example.ec.exception.ObjectNotFoundException;
+import com.example.ec.exceptions.ObjectNotFoundException;
+import com.example.ec.exceptions.QuantityException;
 import com.example.ec.models.ProductModel;
 import com.example.ec.repositories.ProductRepository;
 
@@ -157,6 +158,43 @@ class ProductServiceTest {
 		assertEquals(dto.getName(), result.getName());
 		assertEquals(dto.getDescription(), result.getDescription());
 		assertEquals(dto.getPrice(), result.getPrice());
+	}
+
+	@Test
+	void shouldSubtractQuantity() {
+		Long expectedQuantity = 5L;
+		ProductModel expetedProductModel = createProductModel();
+
+		when(repository.findById(expetedProductModel.getId())).thenReturn(Optional.of(expetedProductModel));
+
+		productService.subtractQuantity(expetedProductModel.getId(), 5L);
+
+		assertEquals(expectedQuantity, expetedProductModel.getQuantity().longValue());
+	}
+
+	@Test
+	void shouldSubtractQuantityEqual() {
+		Long expectedQuantity = 0L;
+		ProductModel expetedProductModel = createProductModel();
+		when(repository.findById(expetedProductModel.getId())).thenReturn(Optional.of(expetedProductModel));
+
+		productService.subtractQuantity(expetedProductModel.getId(), 10L);
+
+		assertEquals(expectedQuantity, expetedProductModel.getQuantity().longValue());
+	}
+
+	@Test
+	void shouldSubtractQuantityQuantityException() {
+
+		ProductModel mockEntity = createProductModel();
+
+		when(repository.findById(mockEntity.getId())).thenReturn(Optional.of(mockEntity));
+
+		assertThatThrownBy(() -> productService.subtractQuantity(mockEntity.getId(), 11L))
+				.isInstanceOf(QuantityException.class)
+				.hasMessageContaining("O valor é maior que a quantidade atual");
+
+		;
 	}
 
 	private static ProductModel createProductModel() {
