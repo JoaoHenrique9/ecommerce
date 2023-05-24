@@ -1,6 +1,7 @@
 package com.example.ec.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,7 +32,7 @@ import com.example.ec.dtos.user.UserResponseDto;
 import com.example.ec.exception.EmailException;
 import com.example.ec.exception.PasswordException;
 import com.example.ec.models.UserModel;
-import com.example.ec.servicers.UserService;
+import com.example.ec.services.UserService;
 
 @ExtendWith(MockitoExtension.class)
 public class UserResourceTest {
@@ -127,6 +128,18 @@ public class UserResourceTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
+    }
+
+    @Test
+    public void shouldFindByEmail() {
+        String email = JOHN_WICK;
+        UserModel userModel = createUserModel();
+        when(userService.findByEmail(email)).thenReturn(userModel);
+
+        var response = userResources.findByEmail(email);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertEquals(userModel, response.getBody());
     }
 
     @Test

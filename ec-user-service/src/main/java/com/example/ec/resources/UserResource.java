@@ -3,6 +3,7 @@ package com.example.ec.resources;
 import java.util.UUID;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,8 +25,9 @@ import com.example.ec.dtos.user.UserResponseDto;
 import com.example.ec.exception.EmailException;
 import com.example.ec.exception.PasswordException;
 import com.example.ec.models.UserModel;
-import com.example.ec.servicers.UserService;
+import com.example.ec.services.UserService;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -70,5 +72,11 @@ public class UserResource {
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         userService.delete(id);
         return ResponseEntity.ok().build();
+    }
+
+    @Hidden
+    @GetMapping("email/")
+    public ResponseEntity<UserModel> findByEmail(@NotNull @RequestBody String email) {
+        return ResponseEntity.ok().body(userService.findByEmail(email));
     }
 }
