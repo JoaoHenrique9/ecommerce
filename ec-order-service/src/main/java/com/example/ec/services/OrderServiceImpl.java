@@ -3,6 +3,8 @@ package com.example.ec.services;
 import java.util.List;
 import java.util.UUID;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +14,6 @@ import com.example.ec.models.OrderModel;
 import com.example.ec.models.enums.OrderStatus;
 import com.example.ec.repositories.OrderRepository;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

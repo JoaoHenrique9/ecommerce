@@ -21,6 +21,4 @@ public class OrderRequestDto {
     private UserDto user;
 
     private List<ProductDto> products;
-
-    private String test;
 }

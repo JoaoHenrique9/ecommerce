@@ -3,11 +3,11 @@ package com.example.ec.services;
 import java.util.List;
 import java.util.UUID;
 
+import javax.validation.Valid;
+
 import com.example.ec.dtos.order.OrderRequestDto;
 import com.example.ec.models.OrderModel;
 import com.example.ec.models.enums.OrderStatus;
-
-import jakarta.validation.Valid;
 
 public interface OrderService {
     void insert(OrderModel order);

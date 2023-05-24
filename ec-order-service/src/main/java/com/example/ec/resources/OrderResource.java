@@ -5,6 +5,10 @@ import static com.example.ec.models.enums.OrderStatus.WAITING_PAYMENT;
 import java.util.List;
 import java.util.UUID;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,9 +24,6 @@ import com.example.ec.dtos.order.OrderResponseDto;
 import com.example.ec.models.enums.OrderStatus;
 import com.example.ec.services.OrderService;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 
 @RestController

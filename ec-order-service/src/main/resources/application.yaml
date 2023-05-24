@@ -1,5 +1,5 @@
 server:
-  port: 8003
+  port: 8084
 
 spring:
   data:
@@ -9,3 +9,14 @@ spring:
   output:
     ansi:
       enabled: ALWAYS
+  application:
+    name: order-service
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client: 
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
