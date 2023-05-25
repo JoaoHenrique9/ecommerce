@@ -3,10 +3,10 @@ package com.example.ec.resources;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +19,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.example.ec.dtos.ProductDto;
 import com.example.ec.dtos.UserDto;
@@ -44,16 +47,24 @@ public class OrderResourceTest {
 
     @Test
     public void shouldInsertOrder() {
+
         OrderRequestDto orderRequestDto = new OrderRequestDto();
+        OrderModel orderModel = createOrderModel();
 
-        OrderModel orderModel = new OrderModel();
+        var request = new MockHttpServletRequest("POST", "/orders/");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        var expectedUri = URI.create("http://localhost" + "/orders/" + "123456");
+
         when(orderService.buildToOrderModel(orderRequestDto)).thenReturn(orderModel);
+        when(orderService.insert(orderModel)).thenReturn(orderModel);
 
-        ResponseEntity<Void> responseEntity = orderResource.insert(orderRequestDto);
-        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+        var response = orderResource.insert(orderRequestDto);
 
-        verify(orderService, times(1)).insert(orderModel);
+        verify(orderService).buildToOrderModel(orderRequestDto);
+        verify(orderService).insert(orderModel);
 
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertThat(response.getHeaders().getLocation()).isEqualTo(expectedUri);
         assertEquals(OrderStatus.WAITING_PAYMENT, orderModel.getOrderStatus());
     }
 

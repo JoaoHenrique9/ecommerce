@@ -1,9 +1,8 @@
 package com.example.ec.services;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -17,11 +16,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 
 import com.example.ec.dtos.ProductDto;
 import com.example.ec.dtos.UserDto;
 import com.example.ec.dtos.order.OrderRequestDto;
 import com.example.ec.exceptions.ObjectNotFoundException;
+import com.example.ec.feignclients.ProductFeignClient;
+import com.example.ec.feignclients.UserFeignClient;
 import com.example.ec.models.OrderModel;
 import com.example.ec.models.enums.OrderStatus;
 import com.example.ec.repositories.OrderRepository;
@@ -29,25 +31,46 @@ import com.example.ec.repositories.OrderRepository;
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceImplTest {
 
+    private static final UUID RANDOM_UUID = UUID.randomUUID();
+
     @Mock
     private OrderRepository orderRepository;
+
+    @Mock
+    private UserFeignClient userFeignClient;
+
+    @Mock
+    private ProductFeignClient productFeignClient;
 
     @InjectMocks
     private OrderServiceImpl orderService;
 
     @BeforeEach
     void setup() {
-        orderService = new OrderServiceImpl(orderRepository);
+        orderService = new OrderServiceImpl(orderRepository, userFeignClient, productFeignClient);
     }
 
     @Test
-    public void shouldInsert() {
-
+    public void shouldInsertOrder() {
         OrderModel orderModel = createOrderModel();
+        UserDto userDto = createUserDto();
+        ProductDto productDto = createProductDto();
 
-        orderService.insert(orderModel);
+        when(userFeignClient.findById(orderModel.getUser().getId())).thenReturn(ResponseEntity.ok(userDto));
+        when(productFeignClient.findById(orderModel.getProducts().get(0).getId()))
+                .thenReturn(ResponseEntity.ok(productDto));
+        when(productFeignClient.removeQuantity(productDto.getId(), productDto.getQuantity()))
+                .thenReturn(ResponseEntity.ok().build());
 
-        verify(orderRepository, times(1)).save(orderModel);
+        OrderModel result = orderService.insert(orderModel);
+
+        verify(userFeignClient).findById(orderModel.getUser().getId());
+        verify(productFeignClient).findById(orderModel.getProducts().get(0).getId());
+        verify(productFeignClient).removeQuantity(productDto.getId(), productDto.getQuantity());
+        verify(orderRepository).save(orderModel);
+
+        assertEquals(OrderStatus.WAITING_PAYMENT, orderModel.getOrderStatus());
+        assertNotNull(result);
     }
 
     @Test
@@ -102,7 +125,7 @@ public class OrderServiceImplTest {
 
     private ProductDto createProductDto() {
         return ProductDto.builder()
-                .id(UUID.randomUUID())
+                .id(RANDOM_UUID)
                 .name("Nome do produto")
                 .price(50.0)
                 .quantity(3L)
@@ -111,7 +134,7 @@ public class OrderServiceImplTest {
 
     private UserDto createUserDto() {
         return UserDto.builder()
-                .id(UUID.randomUUID())
+                .id(RANDOM_UUID)
                 .name("Nome do usuario")
                 .build();
     }

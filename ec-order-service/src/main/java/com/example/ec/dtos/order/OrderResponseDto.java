@@ -1,5 +1,6 @@
 package com.example.ec.dtos.order;
 
+import java.util.Date;
 import java.util.List;
 
 import com.example.ec.dtos.ProductDto;
@@ -22,6 +23,7 @@ public class OrderResponseDto {
     private UserDto user;
     private List<ProductDto> products;
     private Double totalPrice;
+    private Date createdAt;
 
     public OrderResponseDto(OrderModel orderModel) {
         this.id = orderModel.getId();
@@ -29,6 +31,7 @@ public class OrderResponseDto {
         this.user = new UserDto(orderModel.getUser().getId(), orderModel.getUser().getName());
         this.products = orderModel.getProducts();
         this.totalPrice = orderModel.getTotalPrice();
+        this.createdAt = orderModel.getCreatedAt();
     }
 
 }

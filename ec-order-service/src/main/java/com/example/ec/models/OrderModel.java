@@ -1,5 +1,6 @@
 package com.example.ec.models;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -28,6 +29,7 @@ public class OrderModel {
     private OrderStatus orderStatus;
     private UserDto user;
     private List<ProductDto> products;
+    private Date createdAt;
 
     public Double getTotalPrice() {
         return products.stream()

@@ -8,6 +8,8 @@ import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
 import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
+import org.springframework.data.mongodb.core.mapping.event.ValidatingMongoEventListener;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 @Configuration
 public class MongoConfig {
@@ -23,5 +25,11 @@ public class MongoConfig {
 
         MongoTemplate mongoTemplate = new MongoTemplate(mongoDbFactory, converter);
         return mongoTemplate;
+    }
+
+    @Bean
+    public ValidatingMongoEventListener validatingMongoEventListener(
+            final LocalValidatorFactoryBean factory) {
+        return new ValidatingMongoEventListener(factory);
     }
 }

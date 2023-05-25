@@ -10,7 +10,7 @@ import com.example.ec.models.OrderModel;
 import com.example.ec.models.enums.OrderStatus;
 
 public interface OrderService {
-    void insert(OrderModel order);
+    OrderModel insert(@Valid OrderModel order);
 
     void updateStatus(String orderId, OrderStatus newStatus);
 
@@ -19,4 +19,5 @@ public interface OrderService {
     List<OrderModel> findByUserId(UUID userId);
 
     OrderModel buildToOrderModel(@Valid OrderRequestDto orderRequestDto);
+
 }

@@ -33,4 +33,16 @@ public class ResourceExceptionHandler {
 				.build();
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(err);
 	}
+
+	@ExceptionHandler(ProductException.class)
+	public ResponseEntity<StandardError> productException(ProductException e, HttpServletRequest request) {
+		var err = StandardError.builder()
+				.timestamp(System.currentTimeMillis())
+				.status(HttpStatus.BAD_REQUEST.value())
+				.error("Bad Request")
+				.message(e.getMessage())
+				.path(request.getRequestURI())
+				.build();
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
+	}
 }
