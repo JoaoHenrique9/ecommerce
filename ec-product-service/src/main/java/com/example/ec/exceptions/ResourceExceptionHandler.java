@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class ResourceExceptionHandler {
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<StandardError> validation(MethodArgumentNotValidException e, HttpServletRequest request) {
+	public ResponseEntity<ValidationError> validation(MethodArgumentNotValidException e, HttpServletRequest request) {
 
 		var err = new ValidationError(System.currentTimeMillis(), HttpStatus.UNPROCESSABLE_ENTITY.value(),
 				"Validation error", "Formulário inválido", request.getRequestURI());
@@ -23,18 +23,25 @@ public class ResourceExceptionHandler {
 
 	@ExceptionHandler(ObjectNotFoundException.class)
 	public ResponseEntity<StandardError> objectNotFound(ObjectNotFoundException e, HttpServletRequest request) {
-
-		StandardError err = new StandardError(System.currentTimeMillis(), HttpStatus.NOT_FOUND.value(), "Not found",
-				e.getMessage(), request.getRequestURI());
+		var err = StandardError.builder()
+				.timestamp(System.currentTimeMillis())
+				.status(HttpStatus.NOT_FOUND.value())
+				.error("Not found")
+				.message(e.getMessage())
+				.path(request.getRequestURI())
+				.build();
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(err);
 	}
 
 	@ExceptionHandler(QuantityException.class)
 	public ResponseEntity<StandardError> quantityException(QuantityException e, HttpServletRequest request) {
-
-		StandardError err = new StandardError(System.currentTimeMillis(), HttpStatus.BAD_REQUEST.value(), "Bad Request",
-				e.getMessage(), request.getRequestURI());
+		var err = StandardError.builder()
+				.timestamp(System.currentTimeMillis())
+				.status(HttpStatus.BAD_REQUEST.value())
+				.error("Bad Request")
+				.message(e.getMessage())
+				.path(request.getRequestURI())
+				.build();
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
 	}
-
 }

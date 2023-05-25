@@ -59,7 +59,7 @@ class ProductResourceTest {
 	void shouldFindById() {
 		var id = RANDOM_UUID;
 		var productModel = createProductModel();
-		var expectedProductResponseDto = createProductResponseDto();
+		var expectedResponseDto = createProductResponseDto();
 
 		when(productService.findById(id)).thenReturn(productModel);
 		when(productService.buildProductResponseDto(productModel)).thenCallRealMethod();
@@ -70,7 +70,8 @@ class ProductResourceTest {
 		verify(productService).findById(id);
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(response.getBody()).usingRecursiveComparison().isEqualTo(expectedProductResponseDto);
+		assertThat(response.getBody()).usingRecursiveComparison().isEqualTo(expectedResponseDto);
+
 	}
 
 	@Test

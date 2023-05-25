@@ -3,6 +3,8 @@ package com.example.ec.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -61,6 +63,19 @@ class ProductServiceTest {
 		var actualProductModel = productService.findById(id);
 
 		assertThat(actualProductModel).usingRecursiveComparison().isEqualTo(expectedProductModel);
+
+		assertNotNull(actualProductModel.getCreatedAt());
+		assertEquals(actualProductModel.getCreatedAt(), expectedProductModel.getCreatedAt());
+		assertNotEquals(actualProductModel.getCreatedAt(), "");
+
+		assertNotNull(actualProductModel.getUpdatedAt());
+		assertNotEquals(actualProductModel.getUpdatedAt(), "");
+		assertThat(expectedProductModel.getUpdatedAt()).isEqualTo(actualProductModel.getUpdatedAt());
+
+		assertThat(actualProductModel.getIsEnabled())
+				.isNotNull()
+				.isNotEqualTo("")
+				.isEqualTo(expectedProductModel.getIsEnabled());
 	}
 
 	@Test
@@ -114,6 +129,7 @@ class ProductServiceTest {
 
 		verify(repository).save(productModel);
 		assertThat(actualProductModel).usingRecursiveComparison().isEqualTo(expectedProductModel);
+
 	}
 
 	@Test

@@ -3,6 +3,8 @@ package com.example.ec.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,11 +54,21 @@ class CategoryServiceTest {
 	void shouldFindById() {
 		var id = RANDOM_UUID;
 		var expectedCategoryModel = createCategoryModel();
+
 		when(repository.findById(id)).thenReturn(Optional.of(expectedCategoryModel));
 
 		var actualCategoryModel = categoryService.findById(id);
 
 		assertThat(actualCategoryModel).usingRecursiveComparison().isEqualTo(expectedCategoryModel);
+
+		assertNotNull(actualCategoryModel.getCreatedAt());
+		assertEquals(actualCategoryModel.getCreatedAt(), expectedCategoryModel.getCreatedAt());
+		assertNotEquals(actualCategoryModel.getCreatedAt(), "");
+
+		assertNotNull(actualCategoryModel.getUpdatedAt());
+		assertNotEquals(actualCategoryModel.getUpdatedAt(), "");
+		assertThat(expectedCategoryModel.getUpdatedAt()).isEqualTo(actualCategoryModel.getUpdatedAt());
+
 	}
 
 	@Test
