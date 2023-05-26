@@ -1,5 +1,6 @@
 server:
   port: 8082
+  forward-headers-strategy: framework
 
 spring:
   output:
@@ -24,3 +25,4 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://localhost:8761/eureka/
+  
