@@ -10,9 +10,9 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>ec-api-getway-server</artifactId>
+	<artifactId>ec-api-gateway-server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>ec-api-getway-server</name>
+	<name>ec-api-gateway-server</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>11</java.version>

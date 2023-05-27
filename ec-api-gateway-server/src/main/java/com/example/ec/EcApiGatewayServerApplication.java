@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class EcApiGetwayServerApplication {
+public class EcApiGatewayServerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(EcApiGetwayServerApplication.class, args);
+		SpringApplication.run(EcApiGatewayServerApplication.class, args);
 	}
 
 }
