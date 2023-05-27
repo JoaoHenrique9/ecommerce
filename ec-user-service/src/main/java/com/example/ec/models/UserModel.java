@@ -41,9 +41,16 @@ public class UserModel implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(columnDefinition = "uuid")
     private UUID id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(unique = true, nullable = false)
     private String email;
+
+    @Column(nullable = false)
     private String password;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Date createdAt;
 

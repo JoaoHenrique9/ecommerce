@@ -32,6 +32,11 @@ public class Instantiation implements CommandLineRunner {
                 // Inclusão dos produtos e categorias a partir do seed
 
                 // Usuarios
+                UserModel user0 = UserModel.builder()
+                                .name("Admin")
+                                .email("admin@admin.com")
+                                .password(StringUtils.encoder("123456"))
+                                .build();
                 UserModel user1 = UserModel.builder()
                                 .name("John Wick")
                                 .email("john@gmail.com")
@@ -46,15 +51,16 @@ public class Instantiation implements CommandLineRunner {
                 userRepository.saveAll(Arrays.asList(user1, user2));
 
                 // Role
-                Role admin = Role.builder().roleName("ROLE_ADMIN").build();
-                Role user = Role.builder().roleName("ROLE_USER").build();
+                Role admin = Role.builder().id(1L).roleName("ROLE_ADMIN").build();
+                Role user = Role.builder().id(2L).roleName("ROLE_USER").build();
 
                 roleRepository.saveAll(Arrays.asList(admin, user));
 
+                user0.setRoles(new HashSet<Role>(Arrays.asList(admin, user)));
                 user1.setRoles(new HashSet<Role>(Arrays.asList(admin, user)));
                 user2.setRoles(new HashSet<Role>(Arrays.asList(user)));
 
-                userRepository.saveAll(Arrays.asList(user1, user2));
+                userRepository.saveAll(Arrays.asList(user0, user1, user2));
 
         }
 }
