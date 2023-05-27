@@ -3,19 +3,16 @@ server:
   forward-headers-strategy: framework
 
 spring:
+  application:
+    name: auth-service
   output:
     ansi:
       enabled: ALWAYS
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
   datasource:
-    url: jdbc:h2:mem:testdb
-    username: sa
-    password:
-  application:
-    name: auth-service
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:8000}/${DB_NAME:mydatabase}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:1234567}
+    driver-class-name: org.postgresql.Driver
 
 eureka:
   instance:
@@ -24,7 +21,7 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://${EUREKA_SERVICE_URL:localhost:8761}/eureka/
 
 jwt:
   secret: 158ba9c386a9eb4a3858c0b310c39d7ad2cd8f427b5b2fddf6f7984e71d96898
