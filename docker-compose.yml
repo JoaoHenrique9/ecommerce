@@ -1,0 +1,163 @@
+version: "3.7"
+services:
+  # ====================================================================================================================
+  # POSTGRES USER SERVER
+  # ====================================================================================================================
+  pg-user:
+    image: postgres:14-alpine
+    container_name: pg-ecommerce-user
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_PASSWORD: 1234567
+    ports:
+      - 8000:5432
+    volumes:
+      - ./.data/postgresql-user/data:/var/lib/postgresql-user/data
+    networks:
+      - dev-network
+  # ====================================================================================================================
+  # MYSQL PRODUCT SERVER
+  # ====================================================================================================================
+  pg-product:
+    image: postgres:14-alpine
+    container_name: pg-ecommerce-product
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_PASSWORD: 1234567
+    ports:
+      - 8001:5432
+    volumes:
+      - ./.data/postgresql-product/data:/var/lib/postgresql-product/data
+    networks:
+      - dev-network
+  # ====================================================================================================================
+  # MONGO SERVER
+  # ====================================================================================================================
+  mongodb:
+    image: mongo:jammy
+    container_name: ecommerce-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mydatabase
+      MONGO_INITDB_ROOT_PASSWORD: 1234567
+    ports:
+      - 8002:27017
+    volumes:
+      - ./.data/mongodb/data:/data/db
+    networks:
+      - dev-network
+  # ====================================================================================================================
+  # ec-eureka-server
+  # ====================================================================================================================
+  ec-eureka-server:
+    build: ./ec-eureka-server
+    image: ec-eureka-server
+    container_name: ec-eureka-container
+    ports:
+      - 8761:8761
+    networks:
+      - dev-network
+  # ====================================================================================================================
+  # api-getway-server
+  # ====================================================================================================================
+  ec-api-gateway-server:
+    build: ./ec-api-gateway-server
+    image: ec-api-gateway-server
+    container_name: ec-api-gateway-container
+    ports:
+      - 8234:8234
+    depends_on:
+      - ec-eureka-server
+    networks:
+      - dev-network
+    environment:
+      - EUREKA_SERVICE_URL=ec-eureka-server:8761
+  # ====================================================================================================================
+  # ec-product-service
+  # ====================================================================================================================
+  ec-product-service:
+    build: ./ec-product-service
+    image: ec-product-service
+    container_name: ec-product-container
+    ports:
+      - 8081:8081
+    depends_on:
+      - pg-product
+      - ec-eureka-server
+    environment:
+      - EUREKA_SERVICE_URL=ec-eureka-server:8761
+      - DB_HOST=pg-ecommerce-product
+      - DB_PORT=5432
+      - DB_NAME=mydatabase
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=1234567
+    networks:
+      - dev-network
+  # ====================================================================================================================
+  # user-service
+  # ====================================================================================================================
+  ec-user-service:
+    build: ./ec-user-service
+    image: ec-user-service
+    container_name: ec-user-container
+    ports:
+      - 8082:8082
+    depends_on:
+      - pg-user
+      - ec-eureka-server
+    environment:
+      - EUREKA_SERVICE_URL=ec-eureka-server:8761
+      - DB_HOST=pg-ecommerce-user
+      - DB_PORT=5432
+      - DB_NAME=mydatabase
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=1234567
+    networks:
+      - dev-network
+  # ====================================================================================================================
+  # ec-auth-service
+  # ====================================================================================================================
+  ec-auth-service:
+    build: ./ec-auth-service
+    image: ec-auth-service
+    container_name: ec-auth-container
+    ports:
+      - 8083:8083
+    depends_on:
+      - pg-user
+      - ec-eureka-server
+    environment:
+      - EUREKA_SERVICE_URL=ec-eureka-server:8761
+      - DB_HOST=pg-ecommerce-user
+      - DB_PORT=5432
+      - DB_NAME=mydatabase
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=1234567
+    networks:
+      - dev-network
+  # ====================================================================================================================
+  # user-service
+  # ====================================================================================================================
+  ec-order-service:
+    build: ./ec-order-service
+    image: ec-order-service
+    container_name: ec-order-container
+    ports:
+      - 8084:8084
+    depends_on:
+      - mongodb
+      - ec-eureka-server
+    environment:
+      - EUREKA_SERVICE_URL=ec-eureka-server:8761
+      - MONGO_HOST=ecommerce-mongodb
+      - MONGO_PORT=27017
+      - MONGO_DATABASE=mydatabase
+      - MONGO_USERNAME=mydatabase
+      - MONGO_PASSWORD=1234567
+    networks:
+      - dev-network
+  # ======================================================================================================================
+  # REDE
+  # ======================================================================================================================
+networks:
+  dev-network:
+    driver: bridge
