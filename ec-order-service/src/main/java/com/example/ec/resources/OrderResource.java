@@ -4,6 +4,7 @@ import static com.example.ec.models.enums.OrderStatus.WAITING_PAYMENT;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -55,7 +56,7 @@ public class OrderResource {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<OrderResponseDto>> findByUserId(@PathVariable UUID userId) {
-        var orders = orderService.findByUserId(userId).stream().map(OrderResponseDto::new).toList();
+        var orders = orderService.findByUserId(userId).stream().map(OrderResponseDto::new).collect(Collectors.toList());
         return ResponseEntity.ok(orders);
     }
 }

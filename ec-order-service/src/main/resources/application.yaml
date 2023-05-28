@@ -3,16 +3,15 @@ server:
   forward-headers-strategy: framework
 
 spring:
-  data:
-    mongodb:
-      uri: "mongodb://localhost:27017/ecommerce"
-      database: ecommerce
+  application:
+    name: order-service
   output:
     ansi:
       enabled: ALWAYS
-  application:
-    name: order-service
-
+  data:
+    mongodb:
+      uri: "mongodb://${MONGO_USERNAME:mydatabase}:${MONGO_PASSWORD:1234567}@${MONGO_HOST:localhost}:${MONGO_PORT:8002}/${MONGO_DATABASE:mydatabase}?authSource=admin"
+      
 eureka:
   instance:
     prefer-ip-address: true
@@ -20,4 +19,4 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://${EUREKA_SERVICE_URL:localhost:8761}/eureka/
