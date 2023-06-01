@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,6 +50,7 @@ public class ProductResource {
 		return ResponseEntity.ok().body(dtos);
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping
 	public ResponseEntity<Void> save(@RequestBody @Valid ProductRequestDto dto) {
 		ProductModel entity = service.buildProductModel(dto);
@@ -57,6 +59,7 @@ public class ProductResource {
 		return ResponseEntity.created(uri).build();
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PutMapping("/{id}")
 	public ResponseEntity<Void> update(@PathVariable UUID id, @RequestBody @Valid ProductRequestDto dto) {
 		ProductModel entity = service.buildProductModel(dto);
@@ -67,12 +70,14 @@ public class ProductResource {
 	}
 
 	@Hidden
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PutMapping("/{id}/subtract-quantity")
 	public ResponseEntity<Void> subtractQuantity(@PathVariable UUID id, @NotEmpty @RequestParam Long quantity) {
 		service.subtractQuantity(id, quantity);
 		return ResponseEntity.noContent().build();
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable UUID id) {
 		service.delete(id);

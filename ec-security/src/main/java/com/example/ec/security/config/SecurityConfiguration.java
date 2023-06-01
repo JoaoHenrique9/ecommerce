@@ -41,7 +41,9 @@ public class SecurityConfiguration {
 				.authorizeHttpRequests((requests) -> requests
 						.antMatchers(PUBLIC).permitAll()
 						.antMatchers(HttpMethod.POST, "/users/").permitAll()
-						.antMatchers("/products/**").permitAll()
+						.antMatchers(HttpMethod.GET, "/products").permitAll()
+						.antMatchers(HttpMethod.GET, "/products/{id}").permitAll()
+						.antMatchers("/categories/**").permitAll()
 						.requestMatchers(toH2Console()).permitAll()
 						.anyRequest().authenticated())
 				.sessionManagement((session) -> session

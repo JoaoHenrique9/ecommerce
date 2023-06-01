@@ -83,7 +83,13 @@
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.example</groupId>
+			<artifactId>ec-security</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 	</dependencies>
+
 
 	<dependencyManagement>
 		<dependencies>
