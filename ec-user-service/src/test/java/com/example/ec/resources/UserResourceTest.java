@@ -1,7 +1,6 @@
 package com.example.ec.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -128,18 +127,6 @@ public class UserResourceTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-    }
-
-    @Test
-    public void shouldFindByEmail() {
-        String email = JOHN_WICK;
-        UserModel userModel = createUserModel();
-        when(userService.findByEmail(email)).thenReturn(userModel);
-
-        var response = userResources.findByEmail(email);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertEquals(userModel, response.getBody());
     }
 
     @Test

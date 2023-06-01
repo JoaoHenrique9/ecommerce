@@ -9,15 +9,16 @@ spring:
     ansi:
       enabled: ALWAYS
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: create
+      
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:8000}/${DB_NAME:mydatabase}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:1234567}
     driver-class-name: org.postgresql.Driver
   
-
 eureka:
   instance:
     prefer-ip-address: true
@@ -26,3 +27,8 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://${EUREKA_SERVICE_URL:localhost:8761}/eureka/
+
+jwt:
+  secret: 158ba9c386a9eb4a3858c0b310c39d7ad2cd8f427b5b2fddf6f7984e71d96898
+  expiration: 86400000 # a day
+
