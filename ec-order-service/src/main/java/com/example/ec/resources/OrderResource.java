@@ -11,6 +11,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +35,7 @@ public class OrderResource {
 
     private final OrderService orderService;
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<Void> insert(@RequestBody @Valid OrderRequestDto orderRequestDto) {
         var entity = orderService.buildToOrderModel(orderRequestDto);
@@ -43,17 +45,20 @@ public class OrderResource {
         return ResponseEntity.created(uri).build();
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponseDto> findById(@PathVariable @NotEmpty @Size(max = 24) String orderId) {
         return ResponseEntity.ok(new OrderResponseDto(orderService.findById(orderId)));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{orderId}/status/{status}")
     public ResponseEntity<Void> updateStatus(@PathVariable String orderId, @PathVariable int status) {
         orderService.updateStatus(orderId, OrderStatus.valueOf(status));
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<OrderResponseDto>> findByUserId(@PathVariable UUID userId) {
         var orders = orderService.findByUserId(userId).stream().map(OrderResponseDto::new).collect(Collectors.toList());
