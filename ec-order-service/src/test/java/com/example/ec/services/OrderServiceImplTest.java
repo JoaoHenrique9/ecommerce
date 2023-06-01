@@ -27,6 +27,7 @@ import com.example.ec.feignclients.UserFeignClient;
 import com.example.ec.models.OrderModel;
 import com.example.ec.models.enums.OrderStatus;
 import com.example.ec.repositories.OrderRepository;
+import com.example.ec.security.config.JwtService;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceImplTest {
@@ -42,12 +43,15 @@ public class OrderServiceImplTest {
     @Mock
     private ProductFeignClient productFeignClient;
 
+    @Mock
+    private JwtService jwtService;
+
     @InjectMocks
     private OrderServiceImpl orderService;
 
     @BeforeEach
     void setup() {
-        orderService = new OrderServiceImpl(orderRepository, userFeignClient, productFeignClient);
+        orderService = new OrderServiceImpl(orderRepository, userFeignClient, productFeignClient, jwtService);
     }
 
     @Test
@@ -56,17 +60,20 @@ public class OrderServiceImplTest {
         UserDto userDto = createUserDto();
         ProductDto productDto = createProductDto();
 
-        when(userFeignClient.findById(orderModel.getUser().getId())).thenReturn(ResponseEntity.ok(userDto));
+        String token = jwtService.generateSystemToken();
+
+        when(userFeignClient.findById(token, orderModel.getUser().getId())).thenReturn(ResponseEntity.ok(userDto));
         when(productFeignClient.findById(orderModel.getProducts().get(0).getId()))
                 .thenReturn(ResponseEntity.ok(productDto));
-        when(productFeignClient.removeQuantity(productDto.getId(), productDto.getQuantity()))
+        when(productFeignClient.removeQuantity(
+                token, productDto.getId(), productDto.getQuantity()))
                 .thenReturn(ResponseEntity.ok().build());
 
         OrderModel result = orderService.insert(orderModel);
 
-        verify(userFeignClient).findById(orderModel.getUser().getId());
+        verify(userFeignClient).findById(token, orderModel.getUser().getId());
         verify(productFeignClient).findById(orderModel.getProducts().get(0).getId());
-        verify(productFeignClient).removeQuantity(productDto.getId(), productDto.getQuantity());
+        verify(productFeignClient).removeQuantity(token, productDto.getId(), productDto.getQuantity());
         verify(orderRepository).save(orderModel);
 
         assertEquals(OrderStatus.WAITING_PAYMENT, orderModel.getOrderStatus());

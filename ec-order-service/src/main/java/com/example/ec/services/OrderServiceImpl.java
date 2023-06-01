@@ -19,6 +19,7 @@ import com.example.ec.feignclients.UserFeignClient;
 import com.example.ec.models.OrderModel;
 import com.example.ec.models.enums.OrderStatus;
 import com.example.ec.repositories.OrderRepository;
+import com.example.ec.security.config.JwtService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,14 +33,18 @@ public class OrderServiceImpl implements OrderService {
 
     private final ProductFeignClient productFeignClient;
 
+    private final JwtService jwtService;
+
     @Override
     public OrderModel insert(OrderModel order) {
-        userIdentityChecker(order.getUser());
+        String token = jwtService.generateSystemToken();
+        userIdentityChecker(token, order.getUser());
         order.getProducts().stream().forEach(p -> productIdentityChecker(p));
         order.setCreatedAt(new Date());
         orderRepository.save(order);
         try {
-            order.getProducts().stream().forEach(p -> productFeignClient.removeQuantity(p.getId(), p.getQuantity()));
+            order.getProducts().stream()
+                    .forEach(p -> productFeignClient.removeQuantity(token, p.getId(), p.getQuantity()));
         } catch (feign.FeignException.NotFound ex) {
             throw new ObjectNotFoundException("O valor é maior que a quantidade atual");
         }
@@ -72,10 +77,10 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findByUserId(userId);
     }
 
-    private UserDto userIdentityChecker(UserDto dto) {
+    private UserDto userIdentityChecker(String token, UserDto dto) {
         UserDto user;
         try {
-            var response = userFeignClient.findById(dto.getId());
+            var response = userFeignClient.findById(token, dto.getId());
             user = response.getBody();
             if (!dto.equals(user))
                 throw new ObjectNotFoundException("Usuario não encontrado");
@@ -87,16 +92,17 @@ public class OrderServiceImpl implements OrderService {
 
     private ProductDto productIdentityChecker(ProductDto dto) {
         ProductDto product;
+
         try {
             var response = productFeignClient.findById(dto.getId());
             product = response.getBody();
-            if (!dto.equals(product))
+            if (product == null && !dto.equals(product))
                 throw new ObjectNotFoundException("Produto não encontrado");
-            else if (product.getQuantity() == 0)
+            else if (product != null && product.getQuantity() == 0)
                 throw new ProductException("Produto sem estoque");
             else if ((dto.getQuantity() == 0))
                 throw new ProductException("Quantidade invalida");
-            else if (product.getQuantity() < dto.getQuantity())
+            else if (product != null && product.getQuantity() < dto.getQuantity())
                 throw new ProductException("O produto não possui essa quantidade em estoque");
         } catch (feign.FeignException.NotFound ex) {
             throw new ObjectNotFoundException("Produto não encontrado");

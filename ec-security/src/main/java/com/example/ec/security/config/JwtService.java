@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -60,6 +61,15 @@ public class JwtService {
     } catch (Exception e) {
       throw new UnauthorizedException("Erro desconhecido ao extrair reivindicação do token JWT");
     }
+  }
+
+  public String generateSystemToken() {
+    Map<String, Object> claims = new HashMap<>();
+    GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_ADMIN");
+    UserDetails userDetails = new User("system@123.com", "", List.of(authority));
+    String[] roles = { "ROLE_ADMIN" };
+    claims.put("roles", roles);
+    return "Bearer " + generateToken(claims, userDetails);
   }
 
   public String generateToken(UserDetails userDetails) {

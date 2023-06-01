@@ -44,13 +44,11 @@ public class SecurityConfiguration {
 						.antMatchers(HttpMethod.GET, "/products").permitAll()
 						.antMatchers(HttpMethod.GET, "/products/{id}").permitAll()
 						.antMatchers("/categories/**").permitAll()
-						.requestMatchers(toH2Console()).permitAll()
 						.anyRequest().authenticated())
 				.sessionManagement((session) -> session
 						.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 				.csrf((protection) -> protection
-						.ignoringRequestMatchers(toH2Console())
 						.disable())
 				.headers((header) -> header
 
