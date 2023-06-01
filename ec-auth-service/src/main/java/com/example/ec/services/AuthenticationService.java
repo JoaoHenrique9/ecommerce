@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
 
 import com.example.ec.auth.AuthenticationRequest;
 import com.example.ec.auth.AuthenticationResponse;
-import com.example.ec.config.JwtService;
 import com.example.ec.repositories.UserRepository;
+import com.example.ec.security.config.JwtService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
